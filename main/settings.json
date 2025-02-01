@@ -1,0 +1,56 @@
+{
+    "control_layout": {
+        "Xbox Series X Controller": {
+            "Move Left": {
+                "isButton": false,
+                "id": 0,
+                "axisValue": -1
+            },
+            "Move Right": {
+                "isButton": false,
+                "id": 0,
+                "axisValue": 1
+            },
+            "Jump": {
+                "isButton": true,
+                "id": 0,
+                "axisValue": null
+            },
+            "Roll": {
+                "isButton": true,
+                "id": 2,
+                "axisValue": null
+            },
+            "Dodge": {
+                "isButton": true,
+                "id": 1,
+                "axisValue": null
+            },
+            "Inventory": {
+                "isButton": true,
+                "id": 3,
+                "axisValue": null
+            },
+            "Attack toggle": {
+                "isButton": false,
+                "id": 5,
+                "axisValue": 1
+            },
+            "Ranged toggle": {
+                "isButton": false,
+                "id": 4,
+                "axisValue": 1
+            },
+            "Pause": {
+                "isButton": true,
+                "id": 7,
+                "axisValue": null
+            },
+            "Minimap": {
+                "isButton": true,
+                "id": 6,
+                "axisValue": null
+            }
+        }
+    }
+}
