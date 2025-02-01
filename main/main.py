@@ -1,10 +1,15 @@
 import pygame, sys, time
+
 import controller
+import title_screen
+
+print(str(time.time_ns()) + " Initialising main...")
 
 # Initialize pygame
 pygame.init()
 
-controller.init()
+clock = pygame.time.Clock()
+
 """
 pygame.joystick.init()
 
@@ -20,7 +25,7 @@ else:
 
 """
 
-WIN = pygame.display.set_mode(800, 800)
+WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
 pygame.display.set_caption("Push Fullscreen")
 
 done = False
@@ -36,7 +41,7 @@ done = False
 
 # Main loop
 while not done:
-    WIN.fill(0, 0, 0)
+    WIN.fill((0, 0, 0))
     for e in pygame.event.get():
         controller.update_input(event=e)
         if event.type == pygame.QUIT:
@@ -44,5 +49,6 @@ while not done:
 
     pygame.display.flip()
 
+    clock.tick(60)
 # Quit pygame
 pygame.quit()
