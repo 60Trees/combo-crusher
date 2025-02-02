@@ -27,6 +27,7 @@ button_names = [
     "Y",
 ]
 
+
 joystick_names = [
     "Left stick left/right",
     "Left stick up/down",
@@ -38,46 +39,82 @@ joystick_names = [
     "D-Pad/JoyHat Up/Down",
 ]
 class Game_Controls():
-    moveleft = 0
-    moveright = 1
+    nothing = 0
 
-    jump = 2
-    roll = 3
-    dodge = 4
-    inventory = 5
+    moveleft = 1
+    moveright = 2
 
-    Tgl_attack_toggle = 6
-    Tgl_range_toggle = 7
+    jump = 3
+    roll = 4
+    dodge = 5
+    inventory = 6
 
-    Att_attackX = 8
-    Att_attackY = 9
-    Att_attackB = 10
-    Att_attackA = 11
+    Tgl_attack_toggle = 7
+    Tgl_range_toggle = 8
 
-    Rng_attackX = 12
-    Rng_attackY = 13
-    Rng_attackB = 14
-    Rng_attackA = 15
+    Att_attackX = 9
+    Att_attackY = 10
+    Att_attackB = 11
+    Att_attackA = 12
 
-    pausegame = 16
-    minimap = 17
+    Rng_attackX = 13
+    Rng_attackY = 14
+    Rng_attackB = 15
+    Rng_attackA = 16
 
-    GUI_Left = 18
-    GUI_Right = 19
-    GUI_Up = 20
-    GUI_Down = 21
+    Spe_attackX = 17
+    Spe_attackY = 18
+    Spe_attackB = 19
+    Spe_attackA = 20
 
-GmCTRL = Game_Controls()
+    pausegame = 21
+    minimap = 22
 
-GmCTRL_count = len([attr for attr in vars(Game_Controls) if not attr.startswith("__")])
+    GUI_Left = 23
+    GUI_Right = 24
+    GUI_Up = 25
+    GUI_Down = 26
 
-gameControls = []
+    item_left = 27
+    item_right = 28
+INP = Game_Controls()
 
-for i in range(GmCTRL_count):
-    gameControls.append(False)
+BtnNmsToGmInp = {
+    "Move Left": INP.moveleft,
+    "Move Right": INP.moveright,
+    "Jump": INP.jump,
+    "Roll": INP.roll,
+    "Dodge": INP.dodge,
+    "Inventory": INP.inventory,
+    "Selected Item Left": INP.item_left,
+    "Selected Item Right": INP.item_right,
+    "Attack toggle": INP.Tgl_attack_toggle,
+    "Ranged toggle": INP.Tgl_range_toggle,
+    "Pause": INP.pausegame,
+    "Minimap": INP.minimap,
+    "Gui Left": INP.GUI_Left,
+    "Gui Right": INP.GUI_Right,
+    "Gui Up": INP.GUI_Up,
+    "Gui Down": INP.GUI_Down,
+    "A": 0.1,
+    "B": 1.1,
+    "X": 2.1,
+    "Y": 3.1,
+}
+
+def btn_name_to_inp(btn_name):
+    tmp = BtnNmsToGmInp[btn_name]
+    return tmp
+
+INP_count = len([attr for attr in vars(Game_Controls) if not attr.startswith("__")])
+
+GMCTRL = []
+
+for i in range(INP_count):
+    GMCTRL.append(False)
 
 def get_pressed(x):
-    return gameControls[x]
+    return GMCTRL[x]
 
 settings = {}
 
@@ -259,28 +296,165 @@ print(str(time.time_ns()) + " Done")
 print(str(time.time_ns()) + " Dumping settings config from cache...")
 json_func.dump(settings, 'main/settings.json')
 print(str(time.time_ns()) + " Done")
+
+def String_to_control(string):
+    if  string == "A" or \
+        string == "B" or \
+        string == "X" or \
+        string == "Y":
+        if  GMCTRL[INP.Tgl_attack_toggle] and \
+            not GMCTRL[INP.Tgl_range_toggle]:
+            return eval("INP.Att_attack"+string)
+        elif  GMCTRL[INP.Tgl_range_toggle] and \
+            not GMCTRL[INP.Tgl_attack_toggle]:
+            return eval("INP.Rng_attack"+string)
+        elif GMCTRL[INP.Tgl_range_toggle] and GMCTRL[INP.Tgl_attack_toggle]:
+            return eval("INP.Spe_attack"+string)
+        else:
+            return INP.nothing
+    else:
+        return BtnNmsToGmInp[string]
+
 def update_input(event):
     if event.type == pygame.JOYAXISMOTION:
+        # If it's a trigger...
         if event.axis == 4 or event.axis == 5:
+            # If it's pushed enough...
             if event.value > -0.8:
                 if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
                     #print(f"{str(time.time_ns())} Trigger {event.axis} pressed!!1!1!!")
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
                     print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
+
+                    for i in tmp:
+                        if String_to_control(i) == False:
+                            joystick.rumble(random.randint(1,3)/9,(random.randint(1,3)-1)/9,random.randint(10,20)*5)
+                        GMCTRL[String_to_control(i)] = True
+                    
+            # If it's not pushed...
+            elif str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
+                tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
+
+                for i in tmp:
+                    GMCTRL[String_to_control(i)] = False
                 
-        elif event.value > 0.3 or event.value < -0.3:
+        elif event.value > 0.5 or event.value < -0.5:
+            if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
+                if str(event.value)[0] == "-" and "-1" in settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]:
+                    
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
+                    
+                    for i in tmp:
+                        GMCTRL[String_to_control(i)] = True
+
+                    print(f"Action {tmp} done.")
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    
+                    for i in tmp:
+                        GMCTRL[String_to_control(i)] = False
+
+                    print(f"Action {tmp} not done.")
+                elif str(event.value)[0] != "-":
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    
+                    for i in tmp:
+                        GMCTRL[String_to_control(i)] = True
+
+                    print(f"Action {tmp} done.")
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
+                    
+                    for i in tmp:
+                        GMCTRL[String_to_control(i)] = False
+
+                    print(f"Action {tmp} not done.")
+        else:
             if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
                 if str(event.value)[0] == "-" and "-1" in settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]:
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
-                    print(f"Action {tmp} done.")
+                    
+                    for i in tmp:
+                        GMCTRL[String_to_control(i)] = False
+
+                    print(f"Action {tmp} not done.")
                 elif str(event.value)[0] != "-":
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    
+                    for i in tmp:
+                        GMCTRL[String_to_control(i)] = False
+
                     print(f"Action {tmp} done.")
-    
     elif event.type == pygame.JOYBUTTONDOWN:
+        
         if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
             tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
             print(f"Button {tmp} pressed.")
+            for i in tmp:
+                GMCTRL[String_to_control(i)] = True
+            joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
+    elif event.type == pygame.JOYBUTTONUP:
+        if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
+            tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
+            print(f"Button {tmp} unpressed.")
+            for i in tmp:
+                GMCTRL[String_to_control(i)] = False
             joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
                 
 print(str(time.time_ns()) + " Done config")
+
+def check_input():
+    if (GMCTRL[INP.Att_attackX] or \
+        GMCTRL[INP.Att_attackY] or \
+        GMCTRL[INP.Att_attackB] or \
+        GMCTRL[INP.Att_attackA]) and ( \
+        GMCTRL[INP.Tgl_range_toggle] or (
+        not GMCTRL[INP.Tgl_attack_toggle]
+        )):
+        GMCTRL[INP.Att_attackX] = False
+        GMCTRL[INP.Att_attackY] = False
+        GMCTRL[INP.Att_attackB] = False
+        GMCTRL[INP.Att_attackA] = False
+
+    if (GMCTRL[INP.Rng_attackX] or \
+        GMCTRL[INP.Rng_attackY] or \
+        GMCTRL[INP.Rng_attackB] or \
+        GMCTRL[INP.Rng_attackA]) and ( \
+        GMCTRL[INP.Tgl_attack_toggle] or (
+        not GMCTRL[INP.Tgl_range_toggle]
+        )):
+        GMCTRL[INP.Rng_attackX] = False
+        GMCTRL[INP.Rng_attackY] = False
+        GMCTRL[INP.Rng_attackB] = False
+        GMCTRL[INP.Rng_attackA] = False
+
+    if (GMCTRL[INP.Spe_attackX] or \
+        GMCTRL[INP.Spe_attackY] or \
+        GMCTRL[INP.Spe_attackB] or \
+        GMCTRL[INP.Spe_attackA]) and ( \
+        (not GMCTRL[INP.Tgl_attack_toggle]) or (
+        not GMCTRL[INP.Tgl_range_toggle]
+        )):
+        GMCTRL[INP.Spe_attackX] = False
+        GMCTRL[INP.Spe_attackY] = False
+        GMCTRL[INP.Spe_attackB] = False
+        GMCTRL[INP.Spe_attackA] = False
+
+    if  GMCTRL[INP.Att_attackX] or \
+        GMCTRL[INP.Att_attackY] or \
+        GMCTRL[INP.Att_attackB] or \
+        GMCTRL[INP.Att_attackA] or \
+        GMCTRL[INP.Spe_attackX] or \
+        GMCTRL[INP.Spe_attackY] or \
+        GMCTRL[INP.Spe_attackB] or \
+        GMCTRL[INP.Spe_attackA] or \
+        GMCTRL[INP.Rng_attackX] or \
+        GMCTRL[INP.Rng_attackY] or \
+        GMCTRL[INP.Rng_attackB] or \
+        GMCTRL[INP.Rng_attackA]:
+        GMCTRL[INP.dodge] = False
+        GMCTRL[INP.jump] = False
+        GMCTRL[INP.roll] = False
+        GMCTRL[INP.inventory] = False
+
+    if GMCTRL[INP.nothing]:
+        GMCTRL[INP.nothing] = False
