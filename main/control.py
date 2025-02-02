@@ -75,6 +75,11 @@ class Game_Controls():
     GUI_Up = 25
     GUI_Down = 26
 
+    GUI_A = 27
+    GUI_B = 28
+    GUI_X = 29
+    GUI_Y = 30
+
     item_left = 27
     item_right = 28
 INP = Game_Controls()
@@ -96,10 +101,10 @@ BtnNmsToGmInp = {
     "Gui Right": INP.GUI_Right,
     "Gui Up": INP.GUI_Up,
     "Gui Down": INP.GUI_Down,
-    "A": 0.1,
-    "B": 1.1,
-    "X": 2.1,
-    "Y": 3.1,
+    "A": INP.GUI_A,
+    "B": INP.GUI_B,
+    "X": INP.GUI_X,
+    "Y": INP.GUI_Y,
 }
 
 def btn_name_to_inp(btn_name):
@@ -311,7 +316,7 @@ def String_to_control(string):
         elif GMCTRL[INP.Tgl_range_toggle] and GMCTRL[INP.Tgl_attack_toggle]:
             return eval("INP.Spe_attack"+string)
         else:
-            return INP.nothing
+            return BtnNmsToGmInp[string]
     else:
         return BtnNmsToGmInp[string]
 
@@ -322,9 +327,8 @@ def update_input(event):
             # If it's pushed enough...
             if event.value > -0.8:
                 if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
-                    #print(f"{str(time.time_ns())} Trigger {event.axis} pressed!!1!1!!")
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
-                    print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
+                    #print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
 
                     for i in tmp:
                         if String_to_control(i) == False:
@@ -334,7 +338,8 @@ def update_input(event):
             # If it's not pushed...
             elif str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
                 tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
-                print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
+                
+                #print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
 
                 for i in tmp:
                     GMCTRL[String_to_control(i)] = False
@@ -348,26 +353,26 @@ def update_input(event):
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = True
 
-                    print(f"Action {tmp} done.")
+                    #print(f"Action {tmp} done.")
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
-                    print(f"Action {tmp} not done.")
+                    #print(f"Action {tmp} not done.")
                 elif str(event.value)[0] != "-":
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = True
 
-                    print(f"Action {tmp} done.")
+                    #print(f"Action {tmp} done.")
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
-                    print(f"Action {tmp} not done.")
+                    #print(f"Action {tmp} not done.")
         else:
             if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
                 if str(event.value)[0] == "-" and "-1" in settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]:
@@ -376,26 +381,26 @@ def update_input(event):
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
-                    print(f"Action {tmp} not done.")
+                    #print(f"Action {tmp} not done.")
                 elif str(event.value)[0] != "-":
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
-                    print(f"Action {tmp} done.")
+                    #print(f"Action {tmp} done.")
     elif event.type == pygame.JOYBUTTONDOWN:
         
         if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
             tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
-            print(f"Button {tmp} pressed.")
+            #print(f"Button {tmp} pressed.")
             for i in tmp:
                 GMCTRL[String_to_control(i)] = True
             joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
     elif event.type == pygame.JOYBUTTONUP:
         if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
             tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
-            print(f"Button {tmp} unpressed.")
+            #print(f"Button {tmp} unpressed.")
             for i in tmp:
                 GMCTRL[String_to_control(i)] = False
             joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
@@ -403,6 +408,10 @@ def update_input(event):
 print(str(time.time_ns()) + " Done config")
 
 def check_input():
+    check_input2()
+    check_input2()
+
+def check_input2():
     if (GMCTRL[INP.Att_attackX] or \
         GMCTRL[INP.Att_attackY] or \
         GMCTRL[INP.Att_attackB] or \

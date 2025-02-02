@@ -61,7 +61,12 @@ while not done:
     if tmp != btnsPressed:
         btnsPressed = tmp
         control.check_input()
-    print(btnsPressed + str(round(clock.get_fps())))
+        tmp = ""
+        tmp2 = 0
+        for i in control.GMCTRL:
+            tmp = tmp + ("▧ " if i else "▢ ")
+            tmp2 += 1
+        print(btnsPressed + str(round(clock.get_fps())))
 
     pygame.display.flip()
 
