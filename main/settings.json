@@ -104,33 +104,69 @@
                 }
             },
             "button_specific": {
-                "0": "A",
-                "2": "X",
-                "1": "B",
-                "3": "Y",
-                "4": "Selected Item Left",
-                "5": "Selected Item Right",
-                "7": "Pause",
-                "6": "Minimap"
+                "0": [
+                    "Jump",
+                    "A"
+                ],
+                "2": [
+                    "Roll",
+                    "X"
+                ],
+                "1": [
+                    "Dodge",
+                    "B"
+                ],
+                "3": [
+                    "Inventory",
+                    "Y"
+                ],
+                "4": [
+                    "Selected Item Left"
+                ],
+                "5": [
+                    "Selected Item Right"
+                ],
+                "7": [
+                    "Pause"
+                ],
+                "6": [
+                    "Minimap"
+                ]
             },
             "joystick_specific": {
                 "0": {
-                    "-1": "Move Left",
-                    "1": "Move Right"
+                    "-1": [
+                        "Move Left"
+                    ],
+                    "1": [
+                        "Move Right"
+                    ]
                 },
                 "5": {
-                    "1": "Attack toggle"
+                    "1": [
+                        "Attack toggle"
+                    ]
                 },
                 "4": {
-                    "1": "Ranged toggle"
+                    "1": [
+                        "Ranged toggle"
+                    ]
                 },
                 "2": {
-                    "-1": "Gui Left",
-                    "1": "Gui Right"
+                    "-1": [
+                        "Gui Left"
+                    ],
+                    "1": [
+                        "Gui Right"
+                    ]
                 },
                 "3": {
-                    "-1": "Gui Up",
-                    "1": "Gui Down"
+                    "-1": [
+                        "Gui Up"
+                    ],
+                    "1": [
+                        "Gui Down"
+                    ]
                 }
             }
         }

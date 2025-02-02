@@ -1,8 +1,31 @@
-import pygame, sys, time
+import pygame, sys, time, random
 
 import json_func
 
 print(str(time.time_ns()) + " Initialising controller.py")
+
+button_names = [
+    "Move Left",
+    "Move Right",
+    "Jump",
+    "Roll",
+    "Dodge",
+    "Inventory",
+    "Selected Item Left",
+    "Selected Item Right",
+    "Attack toggle",
+    "Ranged toggle",
+    "Pause",
+    "Minimap",
+    "Gui Left",
+    "Gui Right",
+    "Gui Up",
+    "Gui Down",
+    "A",
+    "B",
+    "X",
+    "Y",
+]
 
 joystick_names = [
     "Left stick left/right",
@@ -45,7 +68,16 @@ class Game_Controls():
     GUI_Down = 21
 
 GmCTRL = Game_Controls()
+
+GmCTRL_count = len([attr for attr in vars(Game_Controls) if not attr.startswith("__")])
+
 gameControls = []
+
+for i in range(GmCTRL_count):
+    gameControls.append(False)
+
+def get_pressed(x):
+    return gameControls[x]
 
 settings = {}
 
@@ -83,28 +115,6 @@ else:
         settings["control_layout"][joystick.get_name()]["action_specific"] = {}
         layout_path = settings["control_layout"][joystick.get_name()]
 
-        button_names = [
-            "Move Left",
-            "Move Right",
-            "Jump",
-            "Roll",
-            "Dodge",
-            "Inventory",
-            "Selected Item Left",
-            "Selected Item Right",
-            "Attack toggle",
-            "Ranged toggle",
-            "Pause",
-            "Minimap",
-            "Gui Left",
-            "Gui Right",
-            "Gui Up",
-            "Gui Down",
-            "A",
-            "B",
-            "X",
-            "Y",
-        ]
 
         for i in range(len(button_names)):
             listitems = lambda lst: ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
@@ -234,12 +244,13 @@ result = {"buttons": {}, "joysticks": {}}
 
 for action, props in settings["control_layout"][joystick.get_name()]["action_specific"].items():
     if props["isButton"]:
-        result["buttons"][str(props["id"])] = action
+        if not str(props["id"]) in result["buttons"]: result["buttons"][str(props["id"])] = []
+        result["buttons"][str(props["id"])].append(action)
     else:
         joystick_id = str(props["id"])
-        if joystick_id not in result["joysticks"]:
-            result["joysticks"][joystick_id] = {}
-        result["joysticks"][joystick_id][str(props["axisValue"])] = action
+        if joystick_id not in result["joysticks"]: result["joysticks"][joystick_id] = {}
+        if not str(props["axisValue"]) in result["joysticks"][joystick_id]: result["joysticks"][joystick_id][str(props["axisValue"])] = []
+        result["joysticks"][joystick_id][str(props["axisValue"])].append(action)
 
 settings["control_layout"][joystick.get_name()]["button_specific"] = result["buttons"]
 settings["control_layout"][joystick.get_name()]["joystick_specific"] = result["joysticks"]
@@ -254,7 +265,8 @@ def update_input(event):
             if event.value > -0.8:
                 if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
                     #print(f"{str(time.time_ns())} Trigger {event.axis} pressed!!1!1!!")
-                    print(settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"])
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
                 
         elif event.value > 0.3 or event.value < -0.3:
             if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
@@ -264,5 +276,11 @@ def update_input(event):
                 elif str(event.value)[0] != "-":
                     tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
                     print(f"Action {tmp} done.")
+    
+    elif event.type == pygame.JOYBUTTONDOWN:
+        if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
+            tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
+            print(f"Button {tmp} pressed.")
+            joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
                 
 print(str(time.time_ns()) + " Done config")

@@ -28,6 +28,7 @@ WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
 pygame.display.set_caption("Push Fullscreen")
 
 import controller
+
 done = False
 
 WIN.fill((0, 0, 255))
@@ -42,6 +43,7 @@ pygame.display.set_caption("Smashy Smashy")
 
 done = False
 
+btnsPressed = ""
 # Main loop
 while not done:
     WIN.fill((0, 0, 0))
@@ -49,6 +51,14 @@ while not done:
         controller.update_input(event=e)
         if event.type == pygame.QUIT:
             done = True
+
+    tmp = ""
+    for i in controller.gameControls:
+        tmp = tmp + ("▧" if i else "▢")
+
+    if tmp != btnsPressed:
+        btnsPressed = tmp
+        print(btnsPressed)
 
     pygame.display.flip()
 
