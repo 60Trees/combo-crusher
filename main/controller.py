@@ -80,6 +80,7 @@ else:
     if isConfiguringController:
 
         settings["control_layout"][joystick.get_name()] = {}
+        settings["control_layout"][joystick.get_name()]["action_specific"] = {}
         layout_path = settings["control_layout"][joystick.get_name()]
 
         button_names = [
@@ -126,13 +127,13 @@ else:
                                 confirmed_axis = event.axis
                                 confirmed_axis_value = round(event.value)
                                 joystick.rumble(1, 1, 1000)
-                                layout_path[button_names[i]] = {
+                                layout_path["action_specific"][button_names[i]] = {
                                     "isButton": False,
                                     "id": confirmed_axis,
                                     "axisValue": confirmed_axis_value
                                 }
                                 print("Wait...")
-                                time.sleep(1)
+                                time.sleep(0.5)
                                 pygame.event.get()
                                 print("Confirmed!!")
                             else:
@@ -140,22 +141,22 @@ else:
                                 previously_pushed_axis_value = round(event.value)
                                 confirmed_button = None
                                 print("Wait...")
-                                time.sleep(1)
+                                time.sleep(0.5)
                                 pygame.event.get()
                                 print(f"Do again to confirm")
-                        elif event.axis == 4 or event.axis == 5 and event.value > -0.8:
+                        elif event.axis == 4 or event.axis == 5 and event.value > 0.8:
                             print(f"Triggers pressed, id={event.axis}, value={round(event.value*100)/100}")
                             if previously_pushed_axis == event.axis:
                                 confirmed_axis = event.axis
                                 confirmed_axis_value = 1
                                 joystick.rumble(1, 1, 1000)
-                                layout_path[button_names[i]] = {
+                                layout_path["action_specific"][button_names[i]] = {
                                     "isButton": False,
                                     "id": confirmed_axis,
-                                    "axisValue": confirmed_axis_value
+                                    "axisValue": 1
                                 }
                                 print("Wait...")
-                                time.sleep(1)
+                                time.sleep(0.5)
                                 pygame.event.get()
                                 print("Confirmed!!")
                             else:
@@ -164,7 +165,7 @@ else:
                                 confirmed_button = None
 
                                 print("Wait...")
-                                time.sleep(1)
+                                time.sleep(0.5)
                                 pygame.event.get()
                                 print("Do again to confirm")
 
@@ -176,13 +177,13 @@ else:
                                     confirmed_axis = (6 if event.value[0] != 0 else 7)
                                     confirmed_axis_value = round(event.value[0] if event.value[0] != 0 else event.value[1])
                                     joystick.rumble(1, 1, 1000)
-                                    layout_path[button_names[i]] = {
+                                    layout_path["action_specific"][button_names[i]] = {
                                         "isButton": False,
                                         "id": confirmed_axis,
                                         "axisValue": confirmed_axis_value
                                     }
                                     print("Wait...")
-                                    time.sleep(1)
+                                    time.sleep(0.5)
                                     pygame.event.get()
                                     print("Confirmed!!")
                                 else:
@@ -190,7 +191,7 @@ else:
                                     previously_pushed_axis_value = round(event.value[0] if event.value[0] != 0 else event.value[1])
                                     
                                     print("Wait...")
-                                    time.sleep(1)
+                                    time.sleep(0.5)
                                     pygame.event.get()
                                     print(f"Do again to confirm")
 
@@ -200,13 +201,13 @@ else:
                         if previously_pushed_button == event.button:
                             confirmed_button = event.button
                             joystick.rumble(1, 1, 1000)
-                            layout_path[button_names[i]] = {
+                            layout_path["action_specific"][button_names[i]] = {
                                 "isButton": True,
                                 "id": confirmed_button,
                                 "axisValue": None
                             }
                             print("Wait...")
-                            time.sleep(1)
+                            time.sleep(0.5)
                             pygame.event.get()
                             print("Confirmed!")
                         else:
@@ -215,7 +216,7 @@ else:
                             confirmed_axis_value = None
                             
                             print("Wait...")
-                            time.sleep(1)
+                            time.sleep(0.5)
                             pygame.event.get()
                             print(f"Do again to confirm")
 
@@ -223,17 +224,45 @@ else:
                         print(f"Button {event.button} released")
 
         settings["control_layout"][joystick.get_name()] = layout_path
-        print(str(time.time_ns()) + " Done!!!")
-    print(str(time.time_ns()) + " Done!!")
-print(str(time.time_ns()) + " Done!")
-json_func.dump(settings, 'main/settings.json')
+        print(str(time.time_ns()) + " Done configuring")
+    print(str(time.time_ns()) + " Done checking")
+print(str(time.time_ns()) + " Done init")
 
-isAngleBigenough = lambda angle: angle > 0.3 or angle < -0.3
-def update_input(event):
-    if event.type == pygame.JOYAXISMOTION and isAngleBigenough(event.axis):
-        if event.axis == 4 or event.axis == 5:
-            pass
-        else:
-            pass
-        
+
+print(str(time.time_ns()) + " Adding button-specific layout to settings...")
+result = {"buttons": {}, "joysticks": {}}
+
+for action, props in settings["control_layout"][joystick.get_name()]["action_specific"].items():
+    if props["isButton"]:
+        result["buttons"][str(props["id"])] = action
+    else:
+        joystick_id = str(props["id"])
+        if joystick_id not in result["joysticks"]:
+            result["joysticks"][joystick_id] = {}
+        result["joysticks"][joystick_id][str(props["axisValue"])] = action
+
+settings["control_layout"][joystick.get_name()]["button_specific"] = result["buttons"]
+settings["control_layout"][joystick.get_name()]["joystick_specific"] = result["joysticks"]
 print(str(time.time_ns()) + " Done")
+
+print(str(time.time_ns()) + " Dumping settings config from cache...")
+json_func.dump(settings, 'main/settings.json')
+print(str(time.time_ns()) + " Done")
+def update_input(event):
+    if event.type == pygame.JOYAXISMOTION:
+        if event.axis == 4 or event.axis == 5:
+            if event.value > -0.8:
+                if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
+                    #print(f"{str(time.time_ns())} Trigger {event.axis} pressed!!1!1!!")
+                    print(settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"])
+                
+        elif event.value > 0.3 or event.value < -0.3:
+            if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
+                if str(event.value)[0] == "-" and "-1" in settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]:
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
+                    print(f"Action {tmp} done.")
+                elif str(event.value)[0] != "-":
+                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    print(f"Action {tmp} done.")
+                
+print(str(time.time_ns()) + " Done config")

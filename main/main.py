@@ -1,6 +1,5 @@
 import pygame, sys, time
 
-import controller
 import title_screen
 
 print(str(time.time_ns()) + " Initialising main...")
@@ -28,7 +27,11 @@ else:
 WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
 pygame.display.set_caption("Push Fullscreen")
 
+import controller
 done = False
+
+WIN.fill((0, 0, 255))
+pygame.display.flip()
 
 while not done:
     for event in pygame.event.get():

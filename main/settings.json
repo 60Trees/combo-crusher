@@ -1,105 +1,137 @@
 {
     "control_layout": {
         "Xbox Series X Controller": {
-            "Move Left": {
-                "isButton": false,
-                "id": 0,
-                "axisValue": -1
+            "action_specific": {
+                "Move Left": {
+                    "isButton": false,
+                    "id": 0,
+                    "axisValue": -1
+                },
+                "Move Right": {
+                    "isButton": false,
+                    "id": 0,
+                    "axisValue": 1
+                },
+                "Jump": {
+                    "isButton": true,
+                    "id": 0,
+                    "axisValue": null
+                },
+                "Roll": {
+                    "isButton": true,
+                    "id": 2,
+                    "axisValue": null
+                },
+                "Dodge": {
+                    "isButton": true,
+                    "id": 1,
+                    "axisValue": null
+                },
+                "Inventory": {
+                    "isButton": true,
+                    "id": 3,
+                    "axisValue": null
+                },
+                "Selected Item Left": {
+                    "isButton": true,
+                    "id": 4,
+                    "axisValue": null
+                },
+                "Selected Item Right": {
+                    "isButton": true,
+                    "id": 5,
+                    "axisValue": null
+                },
+                "Attack toggle": {
+                    "isButton": false,
+                    "id": 5,
+                    "axisValue": 1
+                },
+                "Ranged toggle": {
+                    "isButton": false,
+                    "id": 4,
+                    "axisValue": 1
+                },
+                "Pause": {
+                    "isButton": true,
+                    "id": 7,
+                    "axisValue": null
+                },
+                "Minimap": {
+                    "isButton": true,
+                    "id": 6,
+                    "axisValue": null
+                },
+                "Gui Left": {
+                    "isButton": false,
+                    "id": 2,
+                    "axisValue": -1
+                },
+                "Gui Right": {
+                    "isButton": false,
+                    "id": 2,
+                    "axisValue": 1
+                },
+                "Gui Up": {
+                    "isButton": false,
+                    "id": 3,
+                    "axisValue": -1
+                },
+                "Gui Down": {
+                    "isButton": false,
+                    "id": 3,
+                    "axisValue": 1
+                },
+                "A": {
+                    "isButton": true,
+                    "id": 0,
+                    "axisValue": null
+                },
+                "B": {
+                    "isButton": true,
+                    "id": 1,
+                    "axisValue": null
+                },
+                "X": {
+                    "isButton": true,
+                    "id": 2,
+                    "axisValue": null
+                },
+                "Y": {
+                    "isButton": true,
+                    "id": 3,
+                    "axisValue": null
+                }
             },
-            "Move Right": {
-                "isButton": false,
-                "id": 0,
-                "axisValue": 1
+            "button_specific": {
+                "0": "A",
+                "2": "X",
+                "1": "B",
+                "3": "Y",
+                "4": "Selected Item Left",
+                "5": "Selected Item Right",
+                "7": "Pause",
+                "6": "Minimap"
             },
-            "Jump": {
-                "isButton": true,
-                "id": 0,
-                "axisValue": null
-            },
-            "Roll": {
-                "isButton": true,
-                "id": 2,
-                "axisValue": null
-            },
-            "Dodge": {
-                "isButton": true,
-                "id": 1,
-                "axisValue": null
-            },
-            "Inventory": {
-                "isButton": true,
-                "id": 3,
-                "axisValue": null
-            },
-            "Selected Item Left": {
-                "isButton": true,
-                "id": 4,
-                "axisValue": null
-            },
-            "Selected Item Right": {
-                "isButton": true,
-                "id": 5,
-                "axisValue": null
-            },
-            "Attack toggle": {
-                "isButton": false,
-                "id": 5,
-                "axisValue": 1
-            },
-            "Ranged toggle": {
-                "isButton": false,
-                "id": 4,
-                "axisValue": 1
-            },
-            "Pause": {
-                "isButton": true,
-                "id": 7,
-                "axisValue": null
-            },
-            "Minimap": {
-                "isButton": true,
-                "id": 6,
-                "axisValue": null
-            },
-            "Gui Left": {
-                "isButton": false,
-                "id": 0,
-                "axisValue": -1
-            },
-            "Gui Right": {
-                "isButton": false,
-                "id": 0,
-                "axisValue": 1
-            },
-            "Gui Up": {
-                "isButton": false,
-                "id": 1,
-                "axisValue": -1
-            },
-            "Gui Down": {
-                "isButton": false,
-                "id": 1,
-                "axisValue": 1
-            },
-            "A": {
-                "isButton": true,
-                "id": 0,
-                "axisValue": null
-            },
-            "B": {
-                "isButton": true,
-                "id": 1,
-                "axisValue": null
-            },
-            "X": {
-                "isButton": true,
-                "id": 2,
-                "axisValue": null
-            },
-            "Y": {
-                "isButton": true,
-                "id": 3,
-                "axisValue": null
+            "joystick_specific": {
+                "0": {
+                    "-1": "Move Left",
+                    "1": "Move Right"
+                },
+                "5": {
+                    "1": "Attack toggle"
+                },
+                "4": {
+                    "1": "Ranged toggle"
+                },
+                "2": {
+                    "-1": "Gui Left",
+                    "1": "Gui Right"
+                },
+                "3": {
+                    "-1": "Gui Up",
+                    "1": "Gui Down"
+                }
             }
         }
     }
