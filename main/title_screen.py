@@ -1,16 +1,38 @@
 import time, pygame
 
 menu_title = pygame.image.load("main/assets/gui/title.png")
+from control import INP
 
 class class_GUI():
     def __init__(self):
-        self.current_menu_screen = 0
-        self.menu_screen = [
-            {
-                ""
-                "rows": 2,
+        self.current_menu_screen = "main_menu"
+        self.menu_screen = {
+            "main_menu": {
+                "starting_point": (2, -1),
+                "buttons": [
+                    {
+                        "image": menu_title,
+                        "anim": 0,
+                        "anim_positive": True,
+                        "pos_multiplier": (0, -1),
+                        "button_assignment": None,
+                        "text": None,
+                        "button_push": None,
+                        "button_push_menu_screen": None
+                    },
+                    {
+                        "image": 0,
+                        "anim": 0,
+                        "anim_positive": True,
+                        "pos_multiplier": (0, 0),
+                        "button_assignment": 0,
+                        "text": ("Start Game", True, (255, 255, 255)),
+                        "button_push": INP.GUI_A,
+                        "button_push_menu_screen": "in_game"
+                    },
+                ]
             }
-        ]
+        }
         self.selected_button = 0
         self.selected_button_maximum = 3
         self.controls_previously_pressed = [
@@ -33,6 +55,7 @@ class class_GUI():
                     pygame.image.load("main/assets/gui/button_b_default.png"),
                     pygame.image.load("main/assets/gui/button_x_default.png"),
                     pygame.image.load("main/assets/gui/button_y_default.png"),
+                    pygame.image.load("main/assets/gui/button_normal_default.png"),
                 ]
 
                 self.menu_buttons_selected = [
@@ -40,6 +63,7 @@ class class_GUI():
                     pygame.image.load("main/assets/gui/button_b_hover.png"),
                     pygame.image.load("main/assets/gui/button_x_hover.png"),
                     pygame.image.load("main/assets/gui/button_y_hover.png"),
+                    pygame.image.load("main/assets/gui/button_normal_hover.png"),
                 ]
 
                 self.menu_buttons_push = [
@@ -47,6 +71,7 @@ class class_GUI():
                     pygame.image.load("main/assets/gui/button_b_push.png"),
                     pygame.image.load("main/assets/gui/button_x_push.png"),
                     pygame.image.load("main/assets/gui/button_y_push.png"),
+                    pygame.image.load("main/assets/gui/button_normal_push.png"),
                 ]
         self.assets = Assets()
         self.time_passed = 0
@@ -66,12 +91,10 @@ for i2 in range(len(GUI.assets.menu_buttons_push)):
 
 menu_title = pygame.transform.scale(menu_title, (GUI.assets.menu_buttons[0].get_width() * 2 + GUI.scale, GUI.assets.menu_buttons[0].get_height() * 2 + GUI.scale, ))
 
-from control import INP
 
 print(str(time.time_ns()) + " Initialising title_screen.py")
 
 def draw_menu_screen(WIN, controls, pyg):
-
 
     if GUI.time_passed == 0:
         GUI.surface = pygame.Surface(WIN.get_size())
@@ -136,8 +159,8 @@ def draw_menu_screen(WIN, controls, pyg):
     tmp_ispushed = controls[INP.GUI_A]
     tmp_imgs = (GUI.assets.menu_buttons_push if tmp_ispushed else (GUI.assets.menu_buttons_selected if GUI.selected_button == 0 else GUI.assets.menu_buttons))
     GUI.surface.blit(tmp_imgs[0], (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 - GUI.anim[1],
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 - GUI.anim[1],
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0
     ))
     tmp_fontsurf = GUI.assets.pixelfont.render(f"Start game", True, (255, 255, 255))
     tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
@@ -145,16 +168,16 @@ def draw_menu_screen(WIN, controls, pyg):
         GUI.scale * 8
     ))
     GUI.surface.blit(tmp_fontsurf, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 - GUI.anim[1]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 - GUI.anim[1]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
     ))
 
     # Button B
     tmp_ispushed = controls[INP.GUI_B]
     tmp_imgs = (GUI.assets.menu_buttons_push if tmp_ispushed else (GUI.assets.menu_buttons_selected if GUI.selected_button == 1 else GUI.assets.menu_buttons))
     GUI.surface.blit(tmp_imgs[1], (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[1].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 + GUI.anim[2],
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[1].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[1].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 + GUI.anim[2],
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[1].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1
     ))
     tmp_fontsurf = GUI.assets.pixelfont.render(f"Exit", True, (255, 255, 255))
     tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
@@ -162,16 +185,16 @@ def draw_menu_screen(WIN, controls, pyg):
         GUI.scale * 8
     ))
     GUI.surface.blit(tmp_fontsurf, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 + GUI.anim[2]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 + GUI.anim[2]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
     ))
 
     # Button X
     tmp_ispushed = controls[INP.GUI_X]
     tmp_imgs = (GUI.assets.menu_buttons_push if tmp_ispushed else (GUI.assets.menu_buttons_selected if GUI.selected_button == 2 else GUI.assets.menu_buttons))
     GUI.surface.blit(tmp_imgs[2], (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[2].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 - GUI.anim[1],
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[2].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[2].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 - GUI.anim[1],
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[2].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0
     ))
     tmp_fontsurf = GUI.assets.pixelfont.render(f"Options", True, (255, 255, 255))
     tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
@@ -179,16 +202,16 @@ def draw_menu_screen(WIN, controls, pyg):
         GUI.scale * 8
     ))
     GUI.surface.blit(tmp_fontsurf, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 - GUI.anim[1]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 - GUI.anim[1]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 0                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
     ))
 
     # Button Y
     tmp_ispushed = controls[INP.GUI_Y]
     tmp_imgs = (GUI.assets.menu_buttons_push if tmp_ispushed else (GUI.assets.menu_buttons_selected if GUI.selected_button == 3 else GUI.assets.menu_buttons))
     GUI.surface.blit(tmp_imgs[3], (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 + GUI.anim[2],
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 + GUI.anim[2],
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1
     ))
     tmp_fontsurf = GUI.assets.pixelfont.render(f"Credits", True, (255, 255, 255))
     tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
@@ -196,14 +219,14 @@ def draw_menu_screen(WIN, controls, pyg):
         GUI.scale * 8
     ))
     GUI.surface.blit(tmp_fontsurf, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 + GUI.anim[2]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * -1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 1 + GUI.anim[2]         + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * 1                   + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
     ))
 
     # Menu Title
     GUI.surface.blit(menu_title, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_width() * 2) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 + GUI.anim[0],
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_height() * 1) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * -1
+        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_width()) * 0 + GUI.anim[0],
+        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[3].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[1].get_height()) * -1
     ))
 
     GUI.anim[0] /= 1.05
