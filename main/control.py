@@ -80,8 +80,8 @@ class Game_Controls():
     GUI_X = 29
     GUI_Y = 30
 
-    item_left = 27
-    item_right = 28
+    item_left = 31
+    item_right = 32
 INP = Game_Controls()
 
 BtnNmsToGmInp = {

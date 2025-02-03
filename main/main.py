@@ -48,9 +48,11 @@ btnsPressed = ""
 while not done:
     WIN.fill((0, 0, 0))
     for e in pygame.event.get():
-        control.update_input(event=e)
         if event.type == pygame.QUIT:
             done = True
+            pygame.quit()
+            print("Quitting...")
+        control.update_input(e)
 
     tmp = ""
     tmp2 = 0
@@ -67,6 +69,8 @@ while not done:
             tmp = tmp + ("▧ " if i else "▢ ")
             tmp2 += 1
         print(btnsPressed + str(round(clock.get_fps())))
+
+    title_screen.draw_menu_screen(WIN, control.GMCTRL)
 
     pygame.display.flip()
 
