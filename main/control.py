@@ -150,7 +150,9 @@ else:
     temp = ("" if isNewController else "n\'t")
     print(f'{joystick.get_name()} has{temp} been used before.')
     if isNewController: isConfiguringController = True
-    else: isConfiguringController =input(f"Do you want to change controller configuration for {joystick.get_name()}? Y = yes, not y = no? -->").lower() == "y"
+    else:
+        isConfiguringController = False
+        #isConfiguringController =input(f"Do you want to change controller configuration for {joystick.get_name()}? Y = yes, not y = no? -->").lower() == "y"
     if isConfiguringController:
 
         settings["control_layout"][joystick.get_name()] = {}

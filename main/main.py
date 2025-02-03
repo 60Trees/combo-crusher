@@ -1,11 +1,13 @@
 import pygame, sys, time
 
+import control
 import title_screen
 
 print(str(time.time_ns()) + " Initialising main...")
 
 # Initialize pygame
 pygame.init()
+pygame.font.init()
 
 clock = pygame.time.Clock()
 
@@ -26,8 +28,6 @@ else:
 
 WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
 pygame.display.set_caption("Push Fullscreen")
-
-import control
 
 done = False
 
@@ -70,7 +70,7 @@ while not done:
             tmp2 += 1
         print(btnsPressed + str(round(clock.get_fps())))
 
-    title_screen.draw_menu_screen(WIN, control.GMCTRL)
+    title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
 
     pygame.display.flip()
 
