@@ -140,24 +140,63 @@ except:
 # Check for joystick
 if pygame.joystick.get_count() == 0:
     print("No joystick detected")
+    if input("Continue code without controller? (Experimental!) --> ").lower() != "y":
+        print("Exiting code...")
+        sys.exit()
+    else:
+        controller_name = "keyboard"
+        isNewController = not controller_name in settings["control_layout"]
+        if isNewController: isConfiguringController = True
+        else:
+            isConfiguringController = False
+            isConfiguringController =input(f"Do you want to change controller configuration for {controller_name}? Y = yes, not y = no? -->").lower() == "y"
+        if isConfiguringController:
+            pygame.init()
+            TMP_WIN = pygame.display.set_mode((200, 200))
+
+            settings["control_layout"][controller_name] = {}
+            settings["control_layout"][controller_name]["action_specific"] = {}
+            layout_path = settings["control_layout"][controller_name]
+
+            for i in range(len(button_names)):
+                listitems = lambda lst: ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
+                print(f"Controls concist of {listitems(button_names)}.")
+                print(f"Bind action to {button_names[i]}:")
+
+                confirmed_button = None
+
+                while confirmed_button == None:
+                    for event in pygame.event.get():
+                        if event.type == pygame.KEYDOWN:
+                            confirmed_button = event.key
+                            layout_path["action_specific"][button_names[i]] = {
+                                "isButton": True,
+                                "id": confirmed_button,
+                                "axisValue": None
+                            }
+                            print(f"Keyboard key {event.key} pressed.")
 else:
     # Use the first joystick
     joystick = pygame.joystick.Joystick(0)
     joystick.init()
-    print(f"Controller {joystick.get_name()} detected!")
+    controller_name = joystick.get_name()
+    print(f"Controller {controller_name} detected!")
 
-    isNewController = not joystick.get_name() in settings["control_layout"]
+    isNewController = not controller_name in settings["control_layout"]
     temp = ("" if isNewController else "n\'t")
-    print(f'{joystick.get_name()} has{temp} been used before.')
+    print(f'{controller_name} has{temp} been used before.')
     if isNewController: isConfiguringController = True
     else:
         isConfiguringController = False
-        #isConfiguringController =input(f"Do you want to change controller configuration for {joystick.get_name()}? Y = yes, not y = no? -->").lower() == "y"
+        #isConfiguringController =input(f"Do you want to change controller configuration for {controller_name}? Y = yes, not y = no? -->").lower() == "y"
     if isConfiguringController:
 
-        settings["control_layout"][joystick.get_name()] = {}
-        settings["control_layout"][joystick.get_name()]["action_specific"] = {}
-        layout_path = settings["control_layout"][joystick.get_name()]
+        pygame.init()
+        TMP_WIN = pygame.display.set_mode((200, 200))
+
+        settings["control_layout"][controller_name] = {}
+        settings["control_layout"][controller_name]["action_specific"] = {}
+        layout_path = settings["control_layout"][controller_name]
 
 
         for i in range(len(button_names)):
@@ -277,7 +316,7 @@ else:
                     elif event.type == pygame.JOYBUTTONUP:
                         print(f"Button {event.button} released")
 
-        settings["control_layout"][joystick.get_name()] = layout_path
+        settings["control_layout"][controller_name] = layout_path
         print(str(time.time_ns()) + " Done configuring")
     print(str(time.time_ns()) + " Done checking")
 print(str(time.time_ns()) + " Done init")
@@ -286,7 +325,7 @@ print(str(time.time_ns()) + " Done init")
 print(str(time.time_ns()) + " Adding button-specific layout to settings...")
 result = {"buttons": {}, "joysticks": {}}
 
-for action, props in settings["control_layout"][joystick.get_name()]["action_specific"].items():
+for action, props in settings["control_layout"][controller_name]["action_specific"].items():
     if props["isButton"]:
         if not str(props["id"]) in result["buttons"]: result["buttons"][str(props["id"])] = []
         result["buttons"][str(props["id"])].append(action)
@@ -296,8 +335,8 @@ for action, props in settings["control_layout"][joystick.get_name()]["action_spe
         if not str(props["axisValue"]) in result["joysticks"][joystick_id]: result["joysticks"][joystick_id][str(props["axisValue"])] = []
         result["joysticks"][joystick_id][str(props["axisValue"])].append(action)
 
-settings["control_layout"][joystick.get_name()]["button_specific"] = result["buttons"]
-settings["control_layout"][joystick.get_name()]["joystick_specific"] = result["joysticks"]
+settings["control_layout"][controller_name]["button_specific"] = result["buttons"]
+settings["control_layout"][controller_name]["joystick_specific"] = result["joysticks"]
 print(str(time.time_ns()) + " Done")
 
 print(str(time.time_ns()) + " Dumping settings config from cache...")
@@ -328,8 +367,8 @@ def update_input(event):
         if event.axis == 4 or event.axis == 5:
             # If it's pushed enough...
             if event.value > -0.8:
-                if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                if str(event.axis) in settings["control_layout"][controller_name]["joystick_specific"]:
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["1"]
                     #print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
 
                     for i in tmp:
@@ -338,8 +377,8 @@ def update_input(event):
                         GMCTRL[String_to_control(i)] = True
                     
             # If it's not pushed...
-            elif str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
-                tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+            elif str(event.axis) in settings["control_layout"][controller_name]["joystick_specific"]:
+                tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["1"]
                 
                 #print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
 
@@ -347,45 +386,45 @@ def update_input(event):
                     GMCTRL[String_to_control(i)] = False
                 
         elif event.value > 0.5 or event.value < -0.5:
-            if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
-                if str(event.value)[0] == "-" and "-1" in settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]:
+            if str(event.axis) in settings["control_layout"][controller_name]["joystick_specific"]:
+                if str(event.value)[0] == "-" and "-1" in settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]:
                     
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["-1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = True
 
                     #print(f"Action {tmp} done.")
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
                     #print(f"Action {tmp} not done.")
                 elif str(event.value)[0] != "-":
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = True
 
                     #print(f"Action {tmp} done.")
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["-1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
                     #print(f"Action {tmp} not done.")
         else:
-            if str(event.axis) in settings["control_layout"][joystick.get_name()]["joystick_specific"]:
-                if str(event.value)[0] == "-" and "-1" in settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]:
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["-1"]
+            if str(event.axis) in settings["control_layout"][controller_name]["joystick_specific"]:
+                if str(event.value)[0] == "-" and "-1" in settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]:
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["-1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
 
                     #print(f"Action {tmp} not done.")
                 elif str(event.value)[0] != "-":
-                    tmp = settings["control_layout"][joystick.get_name()]["joystick_specific"][str(event.axis)]["1"]
+                    tmp = settings["control_layout"][controller_name]["joystick_specific"][str(event.axis)]["1"]
                     
                     for i in tmp:
                         GMCTRL[String_to_control(i)] = False
@@ -393,19 +432,31 @@ def update_input(event):
                     #print(f"Action {tmp} done.")
     elif event.type == pygame.JOYBUTTONDOWN:
         
-        if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
-            tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
+        if str(event.button) in settings["control_layout"][controller_name]["button_specific"]:
+            tmp = settings["control_layout"][controller_name]["button_specific"][str(event.button)]
             #print(f"Button {tmp} pressed.")
             for i in tmp:
                 GMCTRL[String_to_control(i)] = True
             joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
     elif event.type == pygame.JOYBUTTONUP:
-        if str(event.button) in settings["control_layout"][joystick.get_name()]["button_specific"]:
-            tmp = settings["control_layout"][joystick.get_name()]["button_specific"][str(event.button)]
+        if str(event.button) in settings["control_layout"][controller_name]["button_specific"]:
+            tmp = settings["control_layout"][controller_name]["button_specific"][str(event.button)]
             #print(f"Button {tmp} unpressed.")
             for i in tmp:
                 GMCTRL[String_to_control(i)] = False
             joystick.rumble(random.randint(1, 3) / 9, (random.randint(1, 3) - 1) / 9, random.randint(10, 20) * 5)
+    elif event.type == pygame.KEYDOWN:
+        if str(event.key) in settings["control_layout"][controller_name]["button_specific"]:
+            tmp = settings["control_layout"][controller_name]["button_specific"][str(event.key)]
+            print(f"Keys {tmp} pressed.")
+            for i in tmp:
+                GMCTRL[String_to_control(i)] = True
+    elif event.type == pygame.KEYUP:
+        if str(event.key) in settings["control_layout"][controller_name]["button_specific"]:
+            tmp = settings["control_layout"][controller_name]["button_specific"][str(event.key)]
+            print(f"Keys {tmp} pressed.")
+            for i in tmp:
+                GMCTRL[String_to_control(i)] = False
                 
 print(str(time.time_ns()) + " Done config")
 

@@ -11,21 +11,6 @@ pygame.font.init()
 
 clock = pygame.time.Clock()
 
-"""
-pygame.joystick.init()
-
-
-if pygame.joystick.get_count() == 0:
-    print("No joystick detected")
-else:
-    # Use the first joystick
-    joystick = pygame.joystick.Joystick(0)
-    joystick.init()
-    print(f"Controller {joystick.get_name()} detected!")
-    joystick.rumble(1, 1, 500)
-
-"""
-
 WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
 pygame.display.set_caption("Push Fullscreen")
 
@@ -39,11 +24,14 @@ while not done:
         if event.type == pygame.VIDEORESIZE:
             done = True
 
-pygame.display.set_caption("Smashy Smashy")
+pygame.display.set_caption("Combo Crusher")
 
 done = False
 
 btnsPressed = ""
+
+pygame.display.set_icon(pygame.image.load("main/assets/logo.png"))
+
 # Main loop
 while not done:
     WIN.fill((0, 0, 0))
