@@ -9,6 +9,7 @@ class class_GUI():
         self.current_menu_screen = "main_menu"
         self.menu_screen = {
             "main_menu": {
+                "max_buttons": 3,
                 "starting_point": (2, -1),
                 "buttons": [
                     {
@@ -69,24 +70,49 @@ class class_GUI():
                         "button_assignment": 3,
                         "text": ("Credits", True, (255, 255, 255)),
                         "button_push": INP.GUI_Y,
-                        "button_push_menu_screen": "main_menu"
+                        "button_push_menu_screen": "main_menu/credits"
                     },
                 ]
             },
-            "main_menu/choose_gamemode": {
-                "starting_point": (2, -1),
+            "main_menu/credits": {
+                "max_buttons": 0,
+                "starting_point": (2, 1),
                 "buttons": [
                     {
-                        "image": "GUI.assets.menu_buttons[0]",
-                        "image_hover": "GUI.assets.menu_buttons_selected[0]",
-                        "image_push": "GUI.assets.menu_buttons_push[0]",
+                        "image": "GUI.assets.menu_buttons[4]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[4]",
+                        "image_push": "GUI.assets.menu_buttons_push[4]",
                         "anim": 1,
                         "anim_positive": False,
                         "pos_multiplier": (0, 0),
-                        "button_assignment": 0,
-                        "text": ("Start Game", True, (255, 255, 255)),
-                        "button_push": INP.GUI_A,
+                        "button_assignment": None,
+                        "text": ("This Game...", True, (255, 255, 255)),
+                        "button_push": None,
                         "button_push_menu_screen": "main_menu/choose_gamemode"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[4]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[4]",
+                        "image_push": "GUI.assets.menu_buttons_push[4]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (1, 0),
+                        "button_assignment": None,
+                        "text": ("Is Made By...", True, (255, 255, 255)),
+                        "button_push": None,
+                        "button_push_menu_screen": "main_menu"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[4]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[4]",
+                        "image_push": "GUI.assets.menu_buttons_push[4]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (0.5, 1),
+                        "button_assignment": None,
+                        "text": ("60Trees_ (:", True, (3, 150, 5)),
+                        "button_push": None,
+                        "button_push_menu_screen": "main_menu"
                     },
                     {
                         "image": "GUI.assets.menu_buttons[1]",
@@ -94,7 +120,37 @@ class class_GUI():
                         "image_push": "GUI.assets.menu_buttons_push[1]",
                         "anim": 2,
                         "anim_positive": True,
-                        "pos_multiplier": (0, 1),
+                        "pos_multiplier": (0.5, 2),
+                        "button_assignment": 0,
+                        "text": ("Back", True, (255, 255, 255)),
+                        "button_push": INP.GUI_B,
+                        "button_push_menu_screen": "main_menu"
+                    },
+                ]
+            },
+            "main_menu/choose_gamemode": {
+                "max_buttons": 2,
+                "starting_point": (2, 1),
+                "buttons": [
+                    {
+                        "image": "GUI.assets.menu_buttons[4]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[4]",
+                        "image_push": "GUI.assets.menu_buttons_push[4]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (0, 0),
+                        "button_assignment": 0,
+                        "text": ("Start Game", True, (255, 255, 255)),
+                        "button_push": None,
+                        "button_push_menu_screen": "ingame"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[1]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[1]",
+                        "image_push": "GUI.assets.menu_buttons_push[1]",
+                        "anim": 2,
+                        "anim_positive": True,
+                        "pos_multiplier": (0.5, 2),
                         "button_assignment": 1,
                         "text": ("Back", True, (255, 255, 255)),
                         "button_push": INP.GUI_B,
@@ -110,25 +166,13 @@ class class_GUI():
                         "button_assignment": 2,
                         "text": ("Tuotorial", True, (150, 150, 150)),
                         "button_push": INP.GUI_X,
-                        "button_push_menu_screen": "main_menu"
-                    },
-                    {
-                        "image": "GUI.assets.menu_buttons[3]",
-                        "image_hover": "GUI.assets.menu_buttons_selected[3]",
-                        "image_push": "GUI.assets.menu_buttons_push[3]",
-                        "anim": 2,
-                        "anim_positive": True,
-                        "pos_multiplier": (1, 1),
-                        "button_assignment": 3,
-                        "text": ("Multiplayer", True, (150, 150, 150)),
-                        "button_push": INP.GUI_Y,
-                        "button_push_menu_screen": "main_menu"
+                        "button_push_menu_screen": "tutorial"
                     },
                 ]
             }
         }
         self.selected_button = 0
-        self.selected_button_maximum = 3
+        self.selected_button_maximum = self.menu_screen[self.current_menu_screen]["max_buttons"]
         self.controls_previously_pressed = [
             False,
             False,
@@ -190,8 +234,8 @@ print(str(time.time_ns()) + " Initialising title_screen.py")
 
 def draw_menu_screen(WIN, controls, pyg):
 
+    GUI.surface = pygame.Surface(WIN.get_size())
     if GUI.time_passed == 0:
-        GUI.surface = pygame.Surface(WIN.get_size())
         GUI.anim[0] = WIN.get_width()
         GUI.anim[1] = WIN.get_width()
         GUI.anim[2] = WIN.get_width()
@@ -236,25 +280,13 @@ def draw_menu_screen(WIN, controls, pyg):
     while GUI.selected_button < 0:
         GUI.selected_button += GUI.selected_button_maximum + 1
 
-    if controls[INP.GUI_A]:
-        GUI.selected_button = 0
-        GUI.surface = pygame.Surface(WIN.get_size())
-    if controls[INP.GUI_B]:
-        GUI.selected_button = 1
-        GUI.surface = pygame.Surface(WIN.get_size())
-    if controls[INP.GUI_X]:
-        GUI.selected_button = 2
-        GUI.surface = pygame.Surface(WIN.get_size())
-    if controls[INP.GUI_Y]:
-        GUI.selected_button = 3
-        GUI.surface = pygame.Surface(WIN.get_size())
-
     future_menu_screen = None
 
     timer_goesup = False
     for i in range(len(GUI.menu_screen[GUI.current_menu_screen]["buttons"])):
         tmp_ispushed = False if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] == None else \
-            controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]] and GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"]
+            controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]] if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"] != None else (controls[INP.GUI_A] and GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"])
+        if False if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"] == None else controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]]: GUI.selected_button = GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"]
         if tmp_ispushed:
             timer_goesup = True
             if GUI.timer >= 50:
@@ -277,98 +309,10 @@ def draw_menu_screen(WIN, controls, pyg):
                 WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]                                                                                                                                                                  + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
             ))
 
-    """
-    # Button A
-    i = 1
-    tmp_ispushed = False if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] == None else \
-        controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]] and GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"]
-    GUI.timer += 2 if tmp_ispushed else 0
-    if GUI.timer >= 50: GUI.current_menu_screen = GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push_menu_screen"]
-    tmp_imgs = (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_push"]) if tmp_ispushed else (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_hover"]) if GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] else eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image"])))
-    GUI.surface.blit(tmp_imgs, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1),
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]
-    ))
-    if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"] != None:
-        tmp_fontsurf = GUI.assets.pixelfont.render(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][0], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][1], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][2])
-        tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
-            (tmp_fontsurf.get_width() / tmp_fontsurf.get_height()) * (GUI.scale * 8),
-            GUI.scale * 8
-        ))
-        GUI.surface.blit(tmp_fontsurf, (
-            WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1)           + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-            WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]                                                                                                                                                                  + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
-        ))
-
-    # Button B
-    i = 2
-    tmp_ispushed = False if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] == None else \
-        controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]] and GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"]
-    GUI.timer += 2 if tmp_ispushed else 0
-    if GUI.timer >= 50: GUI.current_menu_screen = GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push_menu_screen"]
-    tmp_imgs = (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_push"]) if tmp_ispushed else (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_hover"]) if GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] else eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image"])))
-    GUI.surface.blit(tmp_imgs, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1),
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]
-    ))
-    if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"] != None:
-        tmp_fontsurf = GUI.assets.pixelfont.render(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][0], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][1], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][2])
-        tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
-            (tmp_fontsurf.get_width() / tmp_fontsurf.get_height()) * (GUI.scale * 8),
-            GUI.scale * 8
-        ))
-        GUI.surface.blit(tmp_fontsurf, (
-            WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1)           + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-            WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]                                                                                                                                                                  + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
-        ))
-
-    # Button X
-    i = 3
-    tmp_ispushed = False if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] == None else \
-        controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]] and GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"]
-    GUI.timer += 2 if tmp_ispushed else 0
-    if GUI.timer >= 50: GUI.current_menu_screen = GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push_menu_screen"]
-    tmp_imgs = (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_push"]) if tmp_ispushed else (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_hover"]) if GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] else eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image"])))
-    GUI.surface.blit(tmp_imgs, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1),
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]
-    ))
-    if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"] != None:
-        tmp_fontsurf = GUI.assets.pixelfont.render(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][0], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][1], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][2])
-        tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
-            (tmp_fontsurf.get_width() / tmp_fontsurf.get_height()) * (GUI.scale * 8),
-            GUI.scale * 8
-        ))
-        GUI.surface.blit(tmp_fontsurf, (
-            WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1)           + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-            WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]                                                                                                                                                                  + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
-        ))
-
-    # Button Y
-    i = 4
-    tmp_ispushed = False if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] == None else \
-        controls[GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push"]] and GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"]
-    GUI.timer += 2 if tmp_ispushed else 0
-    if GUI.timer >= 50: GUI.current_menu_screen = GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_push_menu_screen"]
-    tmp_imgs = (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_push"]) if tmp_ispushed else (eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image_hover"]) if GUI.selected_button == GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["button_assignment"] else eval(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["image"])))
-    GUI.surface.blit(tmp_imgs, (
-        WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1),
-        WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]
-    ))
-    if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"] != None:
-        tmp_fontsurf = GUI.assets.pixelfont.render(GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][0], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][1], GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["text"][2])
-        tmp_fontsurf = pygame.transform.scale(tmp_fontsurf, (
-            (tmp_fontsurf.get_width() / tmp_fontsurf.get_height()) * (GUI.scale * 8),
-            GUI.scale * 8
-        ))
-        GUI.surface.blit(tmp_fontsurf, (
-            WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][0] + (GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim"] * 1 if GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["anim_positive"] else -1)           + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
-            WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]["pos_multiplier"][1]                                                                                                                                                                  + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
-        ))
-"""
-
     if future_menu_screen != None:
         GUI.current_menu_screen = future_menu_screen
+        if GUI.current_menu_screen in GUI.menu_screen:
+            GUI.selected_button_maximum = GUI.menu_screen[GUI.current_menu_screen]["max_buttons"]
 
     if timer_goesup:
         GUI.timer += 1
@@ -380,18 +324,24 @@ def draw_menu_screen(WIN, controls, pyg):
 
     GUI.anim[0] /= 1.05
 
+
     if GUI.time_passed > 20: GUI.anim[1] /= 1.05
     if GUI.time_passed > 40: GUI.anim[2] /= 1.05
-
-    pygame.draw.rect(GUI.surface, (0, 255, 0), pygame.Rect(
-        0,
-        WIN.get_height() - GUI.scale,
-        (WIN.get_width() / 50) * GUI.timer,
-        GUI.scale
-    ))
-    WIN.blit(GUI.surface, (0, 0))
     
-    GUI.surface = pygame.Surface(WIN.get_size())
+    if not GUI.current_menu_screen in GUI.menu_screen:
+        GUI.anim[0] = WIN.get_width()
+        GUI.anim[1] = WIN.get_width()
+        GUI.anim[2] = WIN.get_width()
+        GUI.time_passed = 0
+
+    if GUI.current_menu_screen in GUI.menu_screen:
+        pygame.draw.rect(GUI.surface, (0, 255, 0), pygame.Rect(
+            0,
+            WIN.get_height() - GUI.scale,
+            (WIN.get_width() / 50) * GUI.timer,
+            GUI.scale
+        ))
+    WIN.blit(GUI.surface, (0, 0))
 
     #print(GUI.controls_previously_pressed)
 

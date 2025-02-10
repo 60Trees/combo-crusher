@@ -174,12 +174,12 @@
             "action_specific": {
                 "Move Left": {
                     "isButton": true,
-                    "id": 1073741904,
+                    "id": 97,
                     "axisValue": null
                 },
                 "Move Right": {
                     "isButton": true,
-                    "id": 1073741903,
+                    "id": 100,
                     "axisValue": null
                 },
                 "Jump": {
@@ -204,22 +204,22 @@
                 },
                 "Selected Item Left": {
                     "isButton": true,
-                    "id": 1073741904,
+                    "id": 45,
                     "axisValue": null
                 },
                 "Selected Item Right": {
                     "isButton": true,
-                    "id": 1073741903,
+                    "id": 61,
                     "axisValue": null
                 },
                 "Attack toggle": {
                     "isButton": true,
-                    "id": 99,
+                    "id": 122,
                     "axisValue": null
                 },
                 "Ranged toggle": {
                     "isButton": true,
-                    "id": 122,
+                    "id": 99,
                     "axisValue": null
                 },
                 "Pause": {
@@ -234,22 +234,22 @@
                 },
                 "Gui Left": {
                     "isButton": true,
-                    "id": 1073741904,
+                    "id": 97,
                     "axisValue": null
                 },
                 "Gui Right": {
                     "isButton": true,
-                    "id": 1073741903,
+                    "id": 100,
                     "axisValue": null
                 },
                 "Gui Up": {
                     "isButton": true,
-                    "id": 1073741906,
+                    "id": 119,
                     "axisValue": null
                 },
                 "Gui Down": {
                     "isButton": true,
-                    "id": 1073741905,
+                    "id": 115,
                     "axisValue": null
                 },
                 "A": {
@@ -274,17 +274,13 @@
                 }
             },
             "button_specific": {
-                "1073741904": [
+                "97": [
                     "Move Left",
-                    "Selected Item Left",
-                    "Gui Left",
-                    "X"
+                    "Gui Left"
                 ],
-                "1073741903": [
+                "100": [
                     "Move Right",
-                    "Selected Item Right",
-                    "Gui Right",
-                    "B"
+                    "Gui Right"
                 ],
                 "32": [
                     "Jump"
@@ -298,10 +294,16 @@
                 "101": [
                     "Inventory"
                 ],
-                "99": [
-                    "Attack toggle"
+                "45": [
+                    "Selected Item Left"
+                ],
+                "61": [
+                    "Selected Item Right"
                 ],
                 "122": [
+                    "Attack toggle"
+                ],
+                "99": [
                     "Ranged toggle"
                 ],
                 "27": [
@@ -310,13 +312,23 @@
                 "48": [
                     "Minimap"
                 ],
-                "1073741906": [
-                    "Gui Up",
-                    "Y"
+                "119": [
+                    "Gui Up"
+                ],
+                "115": [
+                    "Gui Down"
                 ],
                 "1073741905": [
-                    "Gui Down",
                     "A"
+                ],
+                "1073741903": [
+                    "B"
+                ],
+                "1073741904": [
+                    "X"
+                ],
+                "1073741906": [
+                    "Y"
                 ]
             },
             "joystick_specific": {}

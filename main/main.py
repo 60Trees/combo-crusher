@@ -1,7 +1,9 @@
 import pygame, sys, time
 
 import control
+import main.game_main
 import title_screen
+import game_main
 
 print(str(time.time_ns()) + " Initialising main...")
 
@@ -35,12 +37,13 @@ pygame.display.set_icon(pygame.image.load("main/assets/logo.png"))
 # Main loop
 while not done:
     WIN.fill((0, 0, 0))
-    for e in pygame.event.get():
+    for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
             pygame.quit()
             print("Quitting...")
-        control.update_input(e)
+            sys.exit()
+        else: control.update_input(event)
 
     tmp = ""
     tmp2 = 0
@@ -58,7 +61,10 @@ while not done:
             tmp2 += 1
         print(btnsPressed + str(round(clock.get_fps())))
 
-    title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
+    if not title_screen.GUI.current_menu_screen in title_screen.GUI.menu_screen:
+        print(f"Currently {title_screen.GUI.current_menu_screen} (: (: (: (:")
+    else:
+        title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
 
     pygame.display.flip()
 
