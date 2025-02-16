@@ -1,7 +1,6 @@
-import time, pygame, json_func
+import time, pygame, json_func, INP
 
 menu_title = pygame.image.load("main/assets/gui/title.png")
-from control import INP
 
 class class_GUI():
     def __init__(self):
@@ -88,7 +87,7 @@ class class_GUI():
                         "button_assignment": None,
                         "text": ("This Game...", True, (255, 255, 255)),
                         "button_push": None,
-                        "button_push_menu_screen": "main_menu/choose_gamemode"
+                        "button_push_menu_screen": "main_menu"
                     },
                     {
                         "image": "GUI.assets.menu_buttons[4]",
@@ -108,9 +107,21 @@ class class_GUI():
                         "image_push": "GUI.assets.menu_buttons_push[4]",
                         "anim": 1,
                         "anim_positive": False,
-                        "pos_multiplier": (0.5, 1),
+                        "pos_multiplier": (0, 1),
                         "button_assignment": None,
-                        "text": ("60Trees_ (:", True, (3, 150, 5)),
+                        "text": ("Game made by 60Trees_", True, (3, 150, 5)),
+                        "button_push": None,
+                        "button_push_menu_screen": "main_menu"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[4]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[4]",
+                        "image_push": "GUI.assets.menu_buttons_push[4]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (1, 1),
+                        "button_assignment": None,
+                        "text": ("Some assets made by Alex <3", True, (3, 150, 5)),
                         "button_push": None,
                         "button_push_menu_screen": "main_menu"
                     },

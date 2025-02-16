@@ -1,9 +1,7 @@
 import pygame, sys, time
 
 import control
-import main.game_main
-import title_screen
-import game_main
+import game_main as GAME
 
 print(str(time.time_ns()) + " Initialising main...")
 
@@ -60,11 +58,12 @@ while not done:
             tmp = tmp + ("▧ " if i else "▢ ")
             tmp2 += 1
         print(btnsPressed + str(round(clock.get_fps())))
-
-    if not title_screen.GUI.current_menu_screen in title_screen.GUI.menu_screen:
-        print(f"Currently {title_screen.GUI.current_menu_screen} (: (: (: (:")
+    
+    if not GAME.title_screen.GUI.current_menu_screen in GAME.title_screen.GUI.menu_screen:
+        #print(f"Currently {title_screen.GUI.current_menu_screen} (: (: (: (:")
+        GAME.draw_game(WIN, control.GMCTRL, pygame)
     else:
-        title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
+        GAME.title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
 
     pygame.display.flip()
 
