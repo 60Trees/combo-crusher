@@ -26,6 +26,7 @@ button_names = [
     "B",
     "X",
     "Y",
+    "Sneak"
 ]
 
 
@@ -61,6 +62,7 @@ BtnNmsToGmInp = {
     "B": INP.GUI_B,
     "X": INP.GUI_X,
     "Y": INP.GUI_Y,
+    "Sneak": INP.sneak
 }
 
 def btn_name_to_inp(btn_name):
@@ -96,47 +98,52 @@ except:
 # Check for joystick
 if pygame.joystick.get_count() == 0:
     print("No joystick detected")
-    if input("Continue code without controller? (Experimental!) --> ").lower() != "y":
-        print("Exiting code...")
-        sys.exit()
+    controller_name = "keyboard"
+    isNewController = not controller_name in settings["control_layout"]
+    if isNewController: isConfiguringController = True
     else:
-        controller_name = "keyboard"
-        isNewController = not controller_name in settings["control_layout"]
-        if isNewController: isConfiguringController = True
-        else:
-            isConfiguringController = False
-            isConfiguringController =input(f"Do you want to change controller configuration for {controller_name}? Y = yes, not y = no? -->").lower() == "y"
-        if isConfiguringController:
-            pygame.init()
-            TMP_WIN = pygame.display.set_mode((200, 200))
+        isConfiguringController = False
+        isConfiguringController =input(f"Do you want to change controller configuration for {controller_name}? Y = yes, not y = no? -->").lower() == "y"
+    if isConfiguringController:
+        pygame.init()
+        TMP_WIN = pygame.display.set_mode((200, 200))
 
-            settings["control_layout"][controller_name] = {}
-            settings["control_layout"][controller_name]["action_specific"] = {}
-            layout_path = settings["control_layout"][controller_name]
+        settings["control_layout"][controller_name] = {}
+        settings["control_layout"][controller_name]["action_specific"] = {}
+        layout_path = settings["control_layout"][controller_name]
 
-            for i in range(len(button_names)):
-                listitems = lambda lst: ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
-                print(f"Controls concist of {listitems(button_names)}.")
-                print(f"Bind action to {button_names[i]}:")
+        for i in range(len(button_names)):
+            listitems = lambda lst: ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
+            print(f"Controls concist of {listitems(button_names)}.")
+            print(f"Bind action to {button_names[i]}:")
 
-                confirmed_button = None
+            confirmed_button = None
 
-                while confirmed_button == None:
-                    for event in pygame.event.get():
-                        if event.type == pygame.KEYDOWN:
-                            confirmed_button = event.key
-                            layout_path["action_specific"][button_names[i]] = {
-                                "isButton": True,
-                                "id": confirmed_button,
-                                "axisValue": None
-                            }
-                            print(f"Keyboard key {event.key} pressed.")
+            while confirmed_button == None:
+                for event in pygame.event.get():
+                    if event.type == pygame.KEYDOWN:
+                        confirmed_button = event.key
+                        layout_path["action_specific"][button_names[i]] = {
+                            "isButton": True,
+                            "id": confirmed_button,
+                            "axisValue": None
+                        }
+                        print(f"Keyboard key {event.key} pressed.")
 else:
     # Use the first joystick
+    supported_controllers = [
+        "Xbox Series X Controller"
+    ]
+    
+
     joystick = pygame.joystick.Joystick(0)
     joystick.init()
     controller_name = joystick.get_name()
     print(f"Controller {controller_name} detected!")
+    if not controller_name in supported_controllers:
+        if input("Continue code without supported controllers? Y for yes (Experimental, might break!!!) --> ").lower() != "y":
+            print("Exiting code...")
+            sys.exit()
 
     isNewController = not controller_name in settings["control_layout"]
     temp = ("" if isNewController else "n\'t")

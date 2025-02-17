@@ -41,3 +41,5 @@ GUI_Y = 30
 
 item_left = 31
 item_right = 32
+
+sneak = 33

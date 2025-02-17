@@ -204,12 +204,12 @@
                 },
                 "Selected Item Left": {
                     "isButton": true,
-                    "id": 45,
+                    "id": 91,
                     "axisValue": null
                 },
                 "Selected Item Right": {
                     "isButton": true,
-                    "id": 61,
+                    "id": 93,
                     "axisValue": null
                 },
                 "Attack toggle": {
@@ -229,7 +229,7 @@
                 },
                 "Minimap": {
                     "isButton": true,
-                    "id": 48,
+                    "id": 45,
                     "axisValue": null
                 },
                 "Gui Left": {
@@ -271,6 +271,11 @@
                     "isButton": true,
                     "id": 1073741906,
                     "axisValue": null
+                },
+                "Sneak": {
+                    "isButton": true,
+                    "id": 1073742049,
+                    "axisValue": null
                 }
             },
             "button_specific": {
@@ -294,10 +299,10 @@
                 "101": [
                     "Inventory"
                 ],
-                "45": [
+                "91": [
                     "Selected Item Left"
                 ],
-                "61": [
+                "93": [
                     "Selected Item Right"
                 ],
                 "122": [
@@ -309,7 +314,7 @@
                 "27": [
                     "Pause"
                 ],
-                "48": [
+                "45": [
                     "Minimap"
                 ],
                 "119": [
@@ -329,6 +334,9 @@
                 ],
                 "1073741906": [
                     "Y"
+                ],
+                "1073742049": [
+                    "Sneak"
                 ]
             },
             "joystick_specific": {}

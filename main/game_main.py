@@ -41,7 +41,7 @@ class class_GAME():
 
         class Player():
             def __init__(self):
-                self.jumpheight = 5
+                self.jumpheight = 10
                 self.previous_isonground = True
                 self.isonground = True
                 self.gravity = 1
@@ -139,7 +139,7 @@ class class_GAME():
                     if self.isonground and CTRL[INP.jump]:
                         self.isonground = False
                         tmpy -= self.jumpheight
-                        
+
                     self.vel = tmpx, tmpy
                 if self.previous_actionstate != self.actionstate or self.previous_isonground != self.isonground:
                     self.animupdatetimer = self.animupdatetimer_maximum + 1
@@ -149,16 +149,19 @@ class class_GAME():
                 tmpx, tmpy = self.pos
                 tmp2x, tmp2y = self.vel
 
-
                 tmpx += tmp2x
                 tmpy += tmp2y
 
-                if tmpy > 0:
+                tmp2y += self.gravity
+
+                if tmpy >= 0:
                     tmpy = 0
-                    tmp2y = 0
+                    tmp2y = min(0, tmp2y)
                     self.isonground = True
+                else: self.isonground = False
 
                 self.pos = tmpx, tmpy
+                self.vel = tmp2x, tmp2y
                 #print(f"Player pos={self.pos}, player vel={self.vel}")
 
             def handle_anim(self):
@@ -225,6 +228,16 @@ def draw_game(WIN, CTRL, pyg):
         (
             round(GAME.player.pos[0]) * GAME.camera.zoom_in + GAME.camera.pos[0] * GAME.camera.zoom_in,
             round(GAME.player.pos[1]) * GAME.camera.zoom_in + GAME.camera.pos[1] * GAME.camera.zoom_in
+        )
+    )
+    pygame.draw.rect(
+        WIN,
+        (100, 100, 100),
+        (
+            0,
+            WIN.get_height() / 2,
+            WIN.get_width(),
+            WIN.get_height()
         )
     )
     #print(f"Printing player at X={GAME.player.pos[0] * GAME.camera.zoom_in + GAME.camera.pos[0] * GAME.camera.zoom_in}, Y={GAME.player.pos[1] * GAME.camera.zoom_in + GAME.camera.pos[1] * GAME.camera.zoom_in}")
