@@ -34,7 +34,7 @@ pygame.display.set_icon(pygame.image.load("main/assets/logo.png"))
 
 # Main loop
 while not done:
-    WIN.fill((0, 0, 0))
+    WIN.fill((255, 255, 255))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             done = True
@@ -58,11 +58,19 @@ while not done:
             tmp = tmp + ("▧ " if i else "▢ ")
             tmp2 += 1
         print(btnsPressed + str(round(clock.get_fps())))
-    
-    if not GAME.title_screen.GUI.current_menu_screen in GAME.title_screen.GUI.menu_screen:
+    print(GAME.title_screen.GUI.current_menu_screen)
+    if "ingame" in GAME.title_screen.GUI.current_menu_screen:
+        if \
+         GAME.draw_game(WIN, control.GMCTRL, not GAME.title_screen.GUI.current_menu_screen == "ingame"):
+            GAME.title_screen.GUI.current_menu_screen = "ingame/pausemenu"
+    if GAME.title_screen.GUI.current_menu_screen in GAME.title_screen.GUI.menu_screen:
+        if "ingame" in GAME.title_screen.GUI.current_menu_screen:
+            pygame.draw.rect(
+                WIN,
+                (50, 50, 50, 10),
+                (0, 0, WIN.get_width(), WIN.get_height())
+            )
         #print(f"Currently {title_screen.GUI.current_menu_screen} (: (: (: (:")
-        GAME.draw_game(WIN, control.GMCTRL, pygame)
-    else:
         GAME.title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
 
     pygame.display.flip()

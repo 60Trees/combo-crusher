@@ -11,7 +11,7 @@ right = True
 
 class class_GAME():
     def __init__(self):
-        
+        self.previouslypausedgame = False
         self.timer = 0
 
         class Surfaces():
@@ -187,7 +187,7 @@ class class_GAME():
                     self.animstate = self.ANIM.walk[self.ANIM.timer]
                 if not self.isonground: self.animstate = self.ANIM.fall
                 if self.vel[1] < 0: self.animstate = self.ANIM.jump
-                if self.vel[1] > 0: print("Falling...")
+                #if self.vel[1] > 0: print("Falling...")
 
             def get_current_state(self):
                 return self.assets[self.animstate]
@@ -197,7 +197,8 @@ GAME = class_GAME()
 
 print(str(time.time_ns()) + " Initialising title_screen.py")
 
-def draw_game(WIN, CTRL, pyg):
+def draw_game(WIN, CTRL, isPaused):
+    ispausing = isPaused
     GAME.surface.characters = pygame.surface.Surface(WIN.get_size())
     GAME.surface.background.fill((255, 0, 0, 255))
     
@@ -213,7 +214,8 @@ def draw_game(WIN, CTRL, pyg):
         GAME.surface.characters.fill((0, 0, 0, 0))
         GAME.gui.fill((0, 0, 0, 0))
         GAME.gui.fill((0, 0, 0, 0))
-    GAME.timer += 1
+    
+    if not isPaused: GAME.timer += 1
 
     surf = GAME.player.assets.sprites[GAME.player.animstate]
     GAME.surface.characters.blit(
@@ -242,19 +244,29 @@ def draw_game(WIN, CTRL, pyg):
     )
     #print(f"Printing player at X={GAME.player.pos[0] * GAME.camera.zoom_in + GAME.camera.pos[0] * GAME.camera.zoom_in}, Y={GAME.player.pos[1] * GAME.camera.zoom_in + GAME.camera.pos[1] * GAME.camera.zoom_in}")
 
-    GAME.player.animupdatetimer += 1
-    print(f"Before: Player pos={GAME.player.pos},vel={GAME.player.vel},isOnGr={GAME.player.isonground},actionstate={GAME.player.actionstate}")
-    GAME.player.handle_action(CTRL)
-    print(f"After:  Player pos={GAME.player.pos},vel={GAME.player.vel},isOnGr={GAME.player.isonground},actionstate={GAME.player.actionstate}")
-    if GAME.player.animupdatetimer > GAME.player.animupdatetimer_maximum:
-        GAME.player.handle_anim()
-        tmp = "right" if GAME.player.facing else "left"
-        print(f"Updating anim, animstate={GAME.player.animstate}, facing={tmp}, actionstate={GAME.player.actionstate}")
-        GAME.player.animupdatetimer = 0
+    if not isPaused:
+        GAME.player.animupdatetimer += 1
+        #print(f"Before: Player pos={GAME.player.pos},vel={GAME.player.vel},isOnGr={GAME.player.isonground},actionstate={GAME.player.actionstate}")
+        GAME.player.handle_action(CTRL)
+        #print(f"After:  Player pos={GAME.player.pos},vel={GAME.player.vel},isOnGr={GAME.player.isonground},actionstate={GAME.player.actionstate}")
+        if GAME.player.animupdatetimer > GAME.player.animupdatetimer_maximum:
+            GAME.player.handle_anim()
+            tmp = "right" if GAME.player.facing else "left"
+            #print(f"Updating anim, animstate={GAME.player.animstate}, facing={tmp}, actionstate={GAME.player.actionstate}")
+            GAME.player.animupdatetimer = 0
+
+    if CTRL[INP.pausegame] and GAME.previouslypausedgame == False:
+        print("Pausing GAMEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+        ispausing = not ispausing
+        GAME.previouslypausedgame = True
+    elif not CTRL[INP.pausegame]:
+        GAME.previouslypausedgame = False
 
     WIN.blit(GAME.surface.background, (0, 0))
     WIN.blit(GAME.surface.characters, (0, 0))
     WIN.blit(GAME.surface.foreground, (0, 0))
     WIN.blit(GAME.surface.gui, (0, 0))
+
+    return ispausing
 
 print(str(time.time_ns()) + " Done")

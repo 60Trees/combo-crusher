@@ -73,6 +73,72 @@ class class_GUI():
                     },
                 ]
             },
+            "ingame/pausemenu": {
+                "max_buttons": 3,
+                "starting_point": (2, -1),
+                "buttons": [
+                    {
+                        "image": "menu_title",
+                        "image_hover": None,
+                        "image_push": None,
+                        "anim": 0,
+                        "anim_positive": True,
+                        "pos_multiplier": (0, -2),
+                        "button_assignment": None,
+                        "text": None,
+                        "button_push": None,
+                        "button_push_menu_screen": "main_menu"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[0]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[0]",
+                        "image_push": "GUI.assets.menu_buttons_push[0]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (0, 0),
+                        "button_assignment": 0,
+                        "text": ("Resume Game", True, (255, 255, 255)),
+                        "button_push": INP.GUI_A,
+                        "button_push_menu_screen": "ingame"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[1]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[1]",
+                        "image_push": "GUI.assets.menu_buttons_push[1]",
+                        "anim": 2,
+                        "anim_positive": True,
+                        "pos_multiplier": (0, 1),
+                        "button_assignment": 1,
+                        "text": ("Quit to Title", True, (255, 255, 255)),
+                        "button_push": INP.GUI_B,
+                        "button_push_menu_screen": "ingame"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[2]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[2]",
+                        "image_push": "GUI.assets.menu_buttons_push[2]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (1, 0),
+                        "button_assignment": 2,
+                        "text": ("Options", True, (255, 255, 255)),
+                        "button_push": INP.GUI_X,
+                        "button_push_menu_screen": "ingame"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[3]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[3]",
+                        "image_push": "GUI.assets.menu_buttons_push[3]",
+                        "anim": 2,
+                        "anim_positive": True,
+                        "pos_multiplier": (1, 1),
+                        "button_assignment": 3,
+                        "text": ("Accesibility settings", True, (255, 255, 255)),
+                        "button_push": INP.GUI_Y,
+                        "button_push_menu_screen": "ingame"
+                    },
+                ]
+            },
             "main_menu/credits": {
                 "max_buttons": 0,
                 "starting_point": (2, 1),
@@ -245,7 +311,8 @@ print(str(time.time_ns()) + " Initialising title_screen.py")
 
 def draw_menu_screen(WIN, controls, pyg):
 
-    GUI.surface = pygame.Surface(WIN.get_size())
+    GUI.surface = pygame.Surface(WIN.get_size(), pygame.SRCALPHA)
+    GUI.surface.fill((0, 0, 0, 128))
     if GUI.time_passed == 0:
         GUI.anim[0] = WIN.get_width()
         GUI.anim[1] = WIN.get_width()
