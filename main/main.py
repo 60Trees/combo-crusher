@@ -5,7 +5,7 @@ import game_main as GAME
 
 print(str(time.time_ns()) + " Initialising main...")
 
-# Initialize pygame
+# Initialise pygame
 pygame.init()
 pygame.font.init()
 
@@ -60,13 +60,13 @@ while not done:
         print(btnsPressed + str(round(clock.get_fps())))
     print(GAME.title_screen.GUI.current_menu_screen)
     if "ingame" in GAME.title_screen.GUI.current_menu_screen:
-        if \
-         GAME.draw_game(WIN, control.GMCTRL, not GAME.title_screen.GUI.current_menu_screen == "ingame"):
-            GAME.title_screen.GUI.current_menu_screen = "ingame/pausemenu"
+        if GAME.draw_game(WIN, control.GMCTRL, not GAME.title_screen.GUI.current_menu_screen == "ingame"):
+            if not "pausemenu" in GAME.title_screen.GUI.current_menu_screen: GAME.title_screen.GUI.current_menu_screen = "ingame/pausemenu"
+
     if GAME.title_screen.GUI.current_menu_screen in GAME.title_screen.GUI.menu_screen:
         if "ingame" in GAME.title_screen.GUI.current_menu_screen:
             pygame.draw.rect(
-                WIN,
+                pygame.surface.Surface((1, 1)),
                 (50, 50, 50, 10),
                 (0, 0, WIN.get_width(), WIN.get_height())
             )

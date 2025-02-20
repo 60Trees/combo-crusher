@@ -111,7 +111,7 @@ class class_GUI():
                         "button_assignment": 1,
                         "text": ("Quit to Title", True, (255, 255, 255)),
                         "button_push": INP.GUI_B,
-                        "button_push_menu_screen": "ingame"
+                        "button_push_menu_screen": "main_menu"
                     },
                     {
                         "image": "GUI.assets.menu_buttons[2]",
@@ -123,7 +123,7 @@ class class_GUI():
                         "button_assignment": 2,
                         "text": ("Options", True, (255, 255, 255)),
                         "button_push": INP.GUI_X,
-                        "button_push_menu_screen": "ingame"
+                        "button_push_menu_screen": "ingame/pausemenu/options"
                     },
                     {
                         "image": "GUI.assets.menu_buttons[3]",
@@ -135,6 +135,48 @@ class class_GUI():
                         "button_assignment": 3,
                         "text": ("Accesibility settings", True, (255, 255, 255)),
                         "button_push": INP.GUI_Y,
+                        "button_push_menu_screen": "ingame"
+                    },
+                ]
+            },
+            "ingame/pausemenu/options": {
+                "max_buttons": 2,
+                "starting_point": (0, 0),
+                "buttons": [
+                    {
+                        "image": "GUI.assets.menu_buttons[0]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[0]",
+                        "image_push": "GUI.assets.menu_buttons_push[0]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (0, 1),
+                        "button_assignment": 1,
+                        "text": ("Resume Game", True, (255, 255, 255)),
+                        "button_push": INP.GUI_A,
+                        "button_push_menu_screen": "ingame"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[1]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[1]",
+                        "image_push": "GUI.assets.menu_buttons_push[1]",
+                        "anim": 2,
+                        "anim_positive": True,
+                        "pos_multiplier": (1, 1),
+                        "button_assignment": 2,
+                        "text": ("Quit to Title", True, (255, 255, 255)),
+                        "button_push": INP.GUI_B,
+                        "button_push_menu_screen": "main_menu"
+                    },
+                    {
+                        "image": "GUI.assets.menu_buttons[2]",
+                        "image_hover": "GUI.assets.menu_buttons_selected[2]",
+                        "image_push": "GUI.assets.menu_buttons_push[2]",
+                        "anim": 1,
+                        "anim_positive": False,
+                        "pos_multiplier": (0, 0),
+                        "button_assignment": 0,
+                        "text": ("You are in options", True, (255, 255, 255)),
+                        "button_push": INP.GUI_X,
                         "button_push_menu_screen": "ingame"
                     },
                 ]
