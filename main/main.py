@@ -1,4 +1,6 @@
-import pygame, sys, time
+import pygame
+import sys
+import time
 
 import control
 import game_main as GAME
@@ -41,7 +43,8 @@ while not done:
             pygame.quit()
             print("Quitting...")
             sys.exit()
-        else: control.update_input(event)
+        else:
+            control.update_input(event)
 
     tmp = ""
     tmp2 = 0
@@ -61,16 +64,10 @@ while not done:
     print(GAME.title_screen.GUI.current_menu_screen)
     if "ingame" in GAME.title_screen.GUI.current_menu_screen:
         if GAME.draw_game(WIN, control.GMCTRL, not GAME.title_screen.GUI.current_menu_screen == "ingame"):
-            if not "pausemenu" in GAME.title_screen.GUI.current_menu_screen: GAME.title_screen.GUI.current_menu_screen = "ingame/pausemenu"
+            if "pausemenu" not in GAME.title_screen.GUI.current_menu_screen:
+                GAME.title_screen.GUI.current_menu_screen = "ingame/pausemenu"
 
     if GAME.title_screen.GUI.current_menu_screen in GAME.title_screen.GUI.menu_screen:
-        if "ingame" in GAME.title_screen.GUI.current_menu_screen:
-            pygame.draw.rect(
-                pygame.surface.Surface((1, 1)),
-                (50, 50, 50, 10),
-                (0, 0, WIN.get_width(), WIN.get_height())
-            )
-        #print(f"Currently {title_screen.GUI.current_menu_screen} (: (: (: (:")
         GAME.title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
 
     pygame.display.flip()

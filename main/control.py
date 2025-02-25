@@ -1,4 +1,7 @@
-import pygame, sys, time, random
+import pygame
+import sys
+import time
+import random
 
 import json_func
 import INP
@@ -90,7 +93,7 @@ try:
     # Loads part of the settings JSON to ensure it is proper.
     settings["control_layout"]
 except:
-    print(f"controller_settings.json does not exist or is corrupt. Writing settings file now.")
+    print("controller_settings.json does not exist or is corrupt. Writing settings file now.")
     settings = {
         "control_layout": {}
     }
@@ -99,8 +102,9 @@ except:
 if pygame.joystick.get_count() == 0:
     print("No joystick detected")
     controller_name = "keyboard"
-    isNewController = not controller_name in settings["control_layout"]
-    if isNewController: isConfiguringController = True
+    isNewController = controller_name not in settings["control_layout"]
+    if isNewController:
+        isConfiguringController = True
     else:
         isConfiguringController = False
         isConfiguringController =input(f"Do you want to change controller configuration for {controller_name}? Y = yes, not y = no? -->").lower() == "y"
@@ -113,13 +117,14 @@ if pygame.joystick.get_count() == 0:
         layout_path = settings["control_layout"][controller_name]
 
         for i in range(len(button_names)):
-            listitems = lambda lst: ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
+            def listitems(lst):
+                return ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
             print(f"Controls concist of {listitems(button_names)}.")
             print(f"Bind action to {button_names[i]}:")
 
             confirmed_button = None
 
-            while confirmed_button == None:
+            while confirmed_button is None:
                 for event in pygame.event.get():
                     if event.type == pygame.KEYDOWN:
                         confirmed_button = event.key
@@ -140,15 +145,16 @@ else:
     joystick.init()
     controller_name = joystick.get_name()
     print(f"Controller {controller_name} detected!")
-    if not controller_name in supported_controllers:
+    if controller_name not in supported_controllers:
         if input("Continue code without supported controllers? Y for yes (Experimental, might break!!!) --> ").lower() != "y":
             print("Exiting code...")
             sys.exit()
 
-    isNewController = not controller_name in settings["control_layout"]
+    isNewController = controller_name not in settings["control_layout"]
     temp = ("" if isNewController else "n\'t")
     print(f'{controller_name} has{temp} been used before.')
-    if isNewController: isConfiguringController = True
+    if isNewController:
+        isConfiguringController = True
     else:
         isConfiguringController = False
         #isConfiguringController =input(f"Do you want to change controller configuration for {controller_name}? Y = yes, not y = no? -->").lower() == "y"
@@ -163,7 +169,8 @@ else:
 
 
         for i in range(len(button_names)):
-            listitems = lambda lst: ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
+            def listitems(lst):
+                return ''.join([x + ((", " if x != lst[-2] else " and ") if x != lst[-1] else "") for x in lst])
             print(f"Controls concist of {listitems(button_names)}.")
             print(f"Bind action to {button_names[i]}:")
 
@@ -174,7 +181,7 @@ else:
             previously_pushed_axis = None
             previously_pushed_axis_value = None
 
-            while confirmed_button == None and confirmed_axis == None:
+            while confirmed_button is None and confirmed_axis is None:
                 for event in pygame.event.get():
                     if event.type == pygame.JOYAXISMOTION:
                         if event.value < -0.8 or event.value > 0.8 and (not (event.axis == 4 or event.axis == 5)):
@@ -199,7 +206,7 @@ else:
                                 print("Wait...")
                                 time.sleep(0.5)
                                 pygame.event.get()
-                                print(f"Do again to confirm")
+                                print("Do again to confirm")
                         elif event.axis == 4 or event.axis == 5 and event.value > 0.8:
                             print(f"Triggers pressed, id={event.axis}, value={round(event.value*100)/100}")
                             if previously_pushed_axis == event.axis:
@@ -249,7 +256,7 @@ else:
                                     print("Wait...")
                                     time.sleep(0.5)
                                     pygame.event.get()
-                                    print(f"Do again to confirm")
+                                    print("Do again to confirm")
 
                     elif event.type == pygame.JOYBUTTONDOWN:
                         print(f"Button {event.button} pressed")
@@ -274,28 +281,35 @@ else:
                             print("Wait...")
                             time.sleep(0.5)
                             pygame.event.get()
-                            print(f"Do again to confirm")
+                            print("Do again to confirm")
 
                     elif event.type == pygame.JOYBUTTONUP:
                         print(f"Button {event.button} released")
 
         settings["control_layout"][controller_name] = layout_path
+        
         print(str(time.time_ns()) + " Done configuring")
     print(str(time.time_ns()) + " Done checking")
 print(str(time.time_ns()) + " Done init")
-
 
 print(str(time.time_ns()) + " Adding button-specific layout to settings...")
 result = {"buttons": {}, "joysticks": {}}
 
 for action, props in settings["control_layout"][controller_name]["action_specific"].items():
     if props["isButton"]:
-        if not str(props["id"]) in result["buttons"]: result["buttons"][str(props["id"])] = []
+        if str(props["id"]) not in result["buttons"]:
+            result["buttons"][str(props["id"])] = []
+
         result["buttons"][str(props["id"])].append(action)
     else:
         joystick_id = str(props["id"])
-        if joystick_id not in result["joysticks"]: result["joysticks"][joystick_id] = {}
-        if not str(props["axisValue"]) in result["joysticks"][joystick_id]: result["joysticks"][joystick_id][str(props["axisValue"])] = []
+
+        if joystick_id not in result["joysticks"]:
+            result["joysticks"][joystick_id] = {}
+
+        if str(props["axisValue"]) not in result["joysticks"][joystick_id]:
+            result["joysticks"][joystick_id][str(props["axisValue"])] = []
+
         result["joysticks"][joystick_id][str(props["axisValue"])].append(action)
 
 settings["control_layout"][controller_name]["button_specific"] = result["buttons"]
@@ -335,7 +349,7 @@ def update_input(event):
                     #print(f"Trigger {tmp} pressed with {round((event.value+1)/2*100)}% force.")
 
                     for i in tmp:
-                        if String_to_control(i) == False:
+                        if String_to_control(i) is False:
                             joystick.rumble(random.randint(1,3)/9,(random.randint(1,3)-1)/9,random.randint(10,20)*5)
                         GMCTRL[String_to_control(i)] = True
                     
