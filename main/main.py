@@ -1,77 +1,65 @@
-import pygame
-import sys
-import time
 
-import control
+import sys
+import pygame
+
 import game_main as GAME
 
-print(str(time.time_ns()) + " Initialising main...")
+if __name__ == "__main__":
+    # Initialise pygame
+    pygame.init()
+    pygame.font.init()
 
-# Initialise pygame
+    clock = pygame.time.Clock()
+
+    WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
+
+    pygame.display.set_caption("Combo Crusher")
+
+    done = False
+
+    pygame.display.set_icon(pygame.image.load("main/assets/logo.png"))
+
+    GAME.start_game(WIN)
+
+    # Main loop
+    while not done:
+        WIN.fill((255, 255, 255))
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                done = True
+                pygame.quit()
+                sys.exit()
+            else:
+                GAME.control.update_input(event)
+
+        GAME.draw_game(WIN)
+
+        pygame.display.update(pygame.Rect(0, 0, WIN.get_width(), WIN.get_height()))
+        clock.tick(60)
+
+    # Quit pygame
+    pygame.quit()
+else:
+    print(f'why tf is __name__ not "__main__" but instead "{__name__}"?!?!?!')
+    input("Go on... seriously ! Thats not a rhetorical question. Why? --> ")
+"""
+import pygame
 pygame.init()
-pygame.font.init()
-
+screen = pygame.display.set_mode((640, 480))
 clock = pygame.time.Clock()
 
-WIN = pygame.display.set_mode((200, 200), pygame.RESIZABLE)
-pygame.display.set_caption("Push Fullscreen")
+def main():
+   while True:
+      for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+               pygame.quit()
+               return
+            elif event.type == pygame.MOUSEWHEEL:
+               print(event)
+            else:
+               print(event)
+      clock.tick(60)
 
-done = False
-
-WIN.fill((0, 0, 255))
-pygame.display.flip()
-
-while not done:
-    for event in pygame.event.get():
-        if event.type == pygame.VIDEORESIZE:
-            done = True
-
-pygame.display.set_caption("Combo Crusher")
-
-done = False
-
-btnsPressed = ""
-
-pygame.display.set_icon(pygame.image.load("main/assets/logo.png"))
-
-# Main loop
-while not done:
-    WIN.fill((255, 255, 255))
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            done = True
-            pygame.quit()
-            print("Quitting...")
-            sys.exit()
-        else:
-            control.update_input(event)
-
-    tmp = ""
-    tmp2 = 0
-    for i in control.GMCTRL:
-        tmp = tmp + ("▧ " if i else "▢ ")
-        tmp2 += 1
-
-    if tmp != btnsPressed:
-        btnsPressed = tmp
-        control.check_input()
-        tmp = ""
-        tmp2 = 0
-        for i in control.GMCTRL:
-            tmp = tmp + ("▧ " if i else "▢ ")
-            tmp2 += 1
-        print(btnsPressed + str(round(clock.get_fps())))
-    print(GAME.title_screen.GUI.current_menu_screen)
-    if "ingame" in GAME.title_screen.GUI.current_menu_screen:
-        if GAME.draw_game(WIN, control.GMCTRL, not GAME.title_screen.GUI.current_menu_screen == "ingame"):
-            if "pausemenu" not in GAME.title_screen.GUI.current_menu_screen:
-                GAME.title_screen.GUI.current_menu_screen = "ingame/pausemenu"
-
-    if GAME.title_screen.GUI.current_menu_screen in GAME.title_screen.GUI.menu_screen:
-        GAME.title_screen.draw_menu_screen(WIN, control.GMCTRL, pygame)
-
-    pygame.display.flip()
-
-    clock.tick(60)
-# Quit pygame
-pygame.quit()
+# Execute game:
+main()"
+"""

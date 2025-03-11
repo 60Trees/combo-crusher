@@ -1,0 +1,2 @@
+isConfiguringController = False
+askToConfigureController = True

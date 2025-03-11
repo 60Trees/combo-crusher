@@ -28,6 +28,14 @@ This game is in **VERY** early development and probably can't even be called a g
 **However**,  if you are a developer, texture artist or you even have a good idea for a lore concept, contact me and I would gladly accept any help whatsoever towards the project and you will be featured in the credits of the game. So maybe you could help me in some way.
 
 # How to test run
+## Handling pip installs
+External libraries (copy-paste into terminal):
+pip install pygame
+pip install pandas
+
+Python version: Python 3.10.11 64-bit Windows 11
+Works on Windows, not bothered to check on other operating systems
+##
 1. You run the project by running `main.py`.
 2. If you have a supported controller (currently only Xbox Series X / S controller) connected, then nothing happens.
 3. If you have no controller connected, then it uses the keyboard for inputs.

@@ -43,3 +43,9 @@ item_left = 31
 item_right = 32
 
 sneak = 33
+
+class Mouse_click:
+    LEFT = 0
+    MIDDLE = 1
+    RIGHT = 2
+click = Mouse_click
