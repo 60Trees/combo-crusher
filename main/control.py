@@ -438,7 +438,6 @@ def register_input(event):
     elif event.type == pygame.KEYDOWN:
         if str(event.key) in settings["control_layout"][controller_name]["button_specific"]:
             tmp = settings["control_layout"][controller_name]["button_specific"][str(event.key)]
-            print(f"Keys {tmp} pressed.")
             for i in tmp:
                 GMCTRL.pushed[String_to_control(i)] = True
                 GMCTRL.tapped[String_to_control(i)] = True
@@ -447,7 +446,6 @@ def register_input(event):
     elif event.type == pygame.KEYUP:
         if str(event.key) in settings["control_layout"][controller_name]["button_specific"]:
             tmp = settings["control_layout"][controller_name]["button_specific"][str(event.key)]
-            print(f"Keys {tmp} pressed.")
             for i in tmp:
                 GMCTRL.pushed[String_to_control(i)] = False
         GMCTRL.cursor.isHidden = True

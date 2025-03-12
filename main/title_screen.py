@@ -47,7 +47,7 @@ class class_GUI():
                 ]
         self.assets = Assets()
         self.time_passed = 0
-    def reset_anim(self, surfaces):
+    def reset_anim(self, WIN):
         print("Resetting anim!!")
         self.anim[0] = 3.000
         self.anim[1] = 3.000
@@ -69,7 +69,7 @@ for i2 in range(len(GUI.assets.menu_buttons_push)):
 
 menu_title = pygame.transform.scale(menu_title, (GUI.assets.menu_buttons[0].get_width() * 2 + GUI.scale, GUI.assets.menu_buttons[0].get_height() * 2 + GUI.scale, ))
 
-def draw_menu_screen(data, surfaces):
+def draw_menu_screen(data, WIN):
     print(GUI.anim)
     GUI.time_passed += 1
     
@@ -113,10 +113,10 @@ def draw_menu_screen(data, surfaces):
         current_button = GUI.menu_screen[GUI.current_menu_screen]["buttons"][i]
         
         # This is where the button will be drawn
-        button_positionX = surfaces.GUI.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * current_button["pos_multiplier"][0]
-        button_positionX += (GUI.anim[current_button["anim"]] * (surfaces.GUI.get_width() if current_button["anim_positive"] else -surfaces.GUI.get_width()))
+        button_positionX = WIN.get_width() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_width() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][0]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_width()) * current_button["pos_multiplier"][0]
+        button_positionX += (GUI.anim[current_button["anim"]] * (WIN.get_width() if current_button["anim_positive"] else -WIN.get_width()))
 
-        button_positionY = surfaces.GUI.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * current_button["pos_multiplier"][1]
+        button_positionY = WIN.get_height() / 2 - (GUI.scale + GUI.assets.menu_buttons[0].get_height() * GUI.menu_screen[GUI.current_menu_screen]["starting_point"][1]) / 2 + (GUI.scale + GUI.assets.menu_buttons[0].get_height()) * current_button["pos_multiplier"][1]
         
         if current_button["button_assignment"] is not None and pygame.Rect(button_positionX, button_positionY, GUI.assets.menu_buttons[0].get_width(), GUI.assets.menu_buttons[0].get_height()).collidepoint(data.GMCTRL.cursor.pos):
             GUI.selected_button = current_button["button_assignment"]
@@ -146,7 +146,7 @@ def draw_menu_screen(data, surfaces):
             tmp_imgs = eval(current_button["image"])
 
         if tmp_imgs is not None:
-            surfaces.GUI.blit(tmp_imgs, (
+            WIN.blit(tmp_imgs, (
                 button_positionX,
                 button_positionY
             ))
@@ -158,7 +158,7 @@ def draw_menu_screen(data, surfaces):
                 (tmp_fontsurf.get_width() / tmp_fontsurf.get_height()) * (GUI.scale * 8),
                 GUI.scale * 8
             ))
-            surfaces.GUI.blit(tmp_fontsurf, (
+            WIN.blit(tmp_fontsurf, (
                 button_positionX + GUI.assets.menu_buttons[0].get_width() / 2 - tmp_fontsurf.get_width() / 2,
                 button_positionY + 4 * GUI.scale + (GUI.scale * 2 if tmp_ispushed else 0)
             ))
@@ -176,26 +176,26 @@ def draw_menu_screen(data, surfaces):
 
     GUI.timer = max(0, min(GUI.timer, GUI.timer_maximum))
 
-    if surfaces.GUI.get_width() * GUI.anim[0] > 1:
+    if WIN.get_width() * GUI.anim[0] > 1:
         GUI.anim[0] /= 1.05
     else:
         GUI.anim[0] = 0
 
     if GUI.time_passed > 20:
-        if surfaces.GUI.get_width() * GUI.anim[1] > 1:
+        if WIN.get_width() * GUI.anim[1] > 1:
             GUI.anim[1] /= 1.05
         else:
             GUI.anim[1] = 0
     if GUI.time_passed > 40:
-        if surfaces.GUI.get_width() * GUI.anim[2] > 1:
+        if WIN.get_width() * GUI.anim[2] > 1:
             GUI.anim[2] /= 1.05
         else:
             GUI.anim[2] = 0
 
     if GUI.current_menu_screen in GUI.menu_screen:
-        pygame.draw.rect(surfaces.GUI, (0, 255, 0), pygame.Rect(
+        pygame.draw.rect(WIN, (0, 255, 0), pygame.Rect(
             0,
-            surfaces.GUI.get_height() - GUI.scale,
-            (surfaces.GUI.get_width() / GUI.timer_maximum) * GUI.timer,
+            WIN.get_height() - GUI.scale,
+            (WIN.get_width() / GUI.timer_maximum) * GUI.timer,
             GUI.scale
         ))

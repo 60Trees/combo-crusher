@@ -14,9 +14,8 @@
 	},
 	"layers": [
 		"AutoLayer2.png",
-		"Decor_underlay.png",
-		"AutoLayer.png",
-		"Interactable_tiles.png"
+		"Interactable_tiles.png",
+		"AutoLayer.png"
 	],
 	"entities": {
 		"Coin": [
