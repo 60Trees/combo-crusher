@@ -19,12 +19,12 @@
                 },
                 "Roll": {
                     "isButton": true,
-                    "id": 2,
+                    "id": 1,
                     "axisValue": null
                 },
                 "Dodge": {
                     "isButton": true,
-                    "id": 1,
+                    "id": 2,
                     "axisValue": null
                 },
                 "Inventory": {
@@ -50,7 +50,7 @@
                 "Ranged toggle": {
                     "isButton": false,
                     "id": 4,
-                    "axisValue": 1
+                    "axisValue": -1
                 },
                 "Pause": {
                     "isButton": true,
@@ -64,22 +64,22 @@
                 },
                 "Gui Left": {
                     "isButton": false,
-                    "id": 2,
+                    "id": 0,
                     "axisValue": -1
                 },
                 "Gui Right": {
                     "isButton": false,
-                    "id": 2,
+                    "id": 0,
                     "axisValue": 1
                 },
                 "Gui Up": {
                     "isButton": false,
-                    "id": 3,
+                    "id": 1,
                     "axisValue": -1
                 },
                 "Gui Down": {
                     "isButton": false,
-                    "id": 3,
+                    "id": 1,
                     "axisValue": 1
                 },
                 "A": {
@@ -101,6 +101,11 @@
                     "isButton": true,
                     "id": 3,
                     "axisValue": null
+                },
+                "Sneak": {
+                    "isButton": true,
+                    "id": 9,
+                    "axisValue": null
                 }
             },
             "button_specific": {
@@ -108,13 +113,13 @@
                     "Jump",
                     "A"
                 ],
-                "2": [
-                    "Roll",
-                    "X"
-                ],
                 "1": [
-                    "Dodge",
+                    "Roll",
                     "B"
+                ],
+                "2": [
+                    "Dodge",
+                    "X"
                 ],
                 "3": [
                     "Inventory",
@@ -131,15 +136,20 @@
                 ],
                 "6": [
                     "Minimap"
+                ],
+                "9": [
+                    "Sneak"
                 ]
             },
             "joystick_specific": {
                 "0": {
                     "-1": [
-                        "Move Left"
+                        "Move Left",
+                        "Gui Left"
                     ],
                     "1": [
-                        "Move Right"
+                        "Move Right",
+                        "Gui Right"
                     ]
                 },
                 "5": {
@@ -148,19 +158,11 @@
                     ]
                 },
                 "4": {
-                    "1": [
+                    "-1": [
                         "Ranged toggle"
                     ]
                 },
-                "2": {
-                    "-1": [
-                        "Gui Left"
-                    ],
-                    "1": [
-                        "Gui Right"
-                    ]
-                },
-                "3": {
+                "1": {
                     "-1": [
                         "Gui Up"
                     ],

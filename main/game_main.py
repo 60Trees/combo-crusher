@@ -1,42 +1,29 @@
-import control
-import game_classes as GAMEDATA
+import game_classes as GAMECLASS
 import input_ID as INP
 import pygame  # noqa: F401
-import title_screen as TITLESCREEN
 
-def start_game(WIN):
-    pass
-
-class Data():
-    def __init__(self):
-        self.ISPAUSED = True
-        self.GMCTRL = []
-data = Data()
-
-def draw_game(WIN):
-    data.GMCTRL = control.GMCTRL
-
+def draw_game(game: GAMECLASS.Game):
     # If it has "ingame" and isn't directly ingame then it must be paused
-    if TITLESCREEN.title_screen_layout.layout_pausedgame in TITLESCREEN.GUI.current_menu_screen and TITLESCREEN.GUI.current_menu_screen != "ingame":
-        data.ISPAUSED = True
+    if game.GUI.layout.pausegame in game.GUI.current_menu_screen and game.GUI.current_menu_screen != "ingame":
+        game.ISPAUSED = True
 
-    if data.GMCTRL.tapped[INP.pausegame] and TITLESCREEN.GUI.current_menu_screen:
-        data.ISPAUSED = not data.ISPAUSED
+    if game.GMCTRL.tapped[INP.pausegame] and game.GUI.current_menu_screen:
+        game.ISPAUSED = not game.ISPAUSED
 
         # If it's paused, then make it the default pause menu.
-        if data.ISPAUSED:
-            TITLESCREEN.GUI.reset_anim(WIN)
-            TITLESCREEN.GUI.current_menu_screen = TITLESCREEN.title_screen_layout.layout_pausedgame
+        if game.ISPAUSED:
+            game.GUI.reset_anim(game)
+            game.GUI.current_menu_screen = game.GUI.layout.pausegame
 
     # If ingame and unpaused then handle action
-    if TITLESCREEN.GUI.current_menu_screen == TITLESCREEN.title_screen_layout.layout_ingame:
-        GAMEDATA.player.handle_action(control.GMCTRL)
+    if game.GUI.current_menu_screen == game.GUI.layout.ingame:
+        game.PLAYER.handle_action(game)
 
     # If ingame then draw level
-    if TITLESCREEN.title_screen_layout.layout_ingame in TITLESCREEN.GUI.current_menu_screen:
-        if control.GMCTRL.windowResized:
-            GAMEDATA.lvl.draw_refresh(WIN)
-        GAMEDATA.lvl.draw(WIN)
+    if game.GUI.layout.ingame in game.GUI.current_menu_screen:
+        if game.GMCTRL.windowResized:
+            game.LEVEL.draw_refresh(game)
+        game.LEVEL.draw(game)
 
-    if TITLESCREEN.GUI.current_menu_screen != TITLESCREEN.title_screen_layout.layout_ingame:
-        TITLESCREEN.draw_menu_screen(data, WIN)
+    if game.GUI.current_menu_screen != game.GUI.layout.ingame:
+        game.GUI.draw_menu_screen(game)

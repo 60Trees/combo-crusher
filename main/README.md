@@ -19,7 +19,9 @@ Here is the combat level of the project:
 * And yes, this is inspired by the Google Doodle of the magic cat fighting off ghosts, except now there is a sword that only hits the enemies you swipe.
 
 Basically you hit the A, B, X and Y in the same order as that on their heads to defeat them.
-At least that's the plan, because currently the only thing in the entire project is a *very* fancy menu screen and a character who broke the fabrics of reality and caused everything to look like placeholder sprites. (That's a joke, my friend is currently working on a standard character, but for now... placeholder images. *\*sigh\**)
+At least that's the plan, because currently the only thing in the entire project is a *very* fancy menu screen and a character who broke the fabrics of reality and caused everything to look like placeholder sprites.
+
+(That's a joke, my friend is currently working on a standard character, but for now... Mario placeholder images. *\*sigh\**)
 
 # **WARNING**
 
@@ -30,10 +32,20 @@ This game is in **VERY** early development and probably can't even be called a g
 # How to test run
 ## Handling pip installs
 External libraries (copy-paste into terminal):
+``` powershell
 pip install pygame
-pip install pandas
+pip install Blaze-Sudio[all]
+```
+Reccomended python version: `Python 3.12.9 64-bit`
 
-Python version: Python 3.10.11 64-bit Windows 11
+Reccomended operating system: Windows 11
+
+Reccomended pygame version:
+
+``` py
+pygame-2.6.1-cp312-cp312-win_amd64.whl
+```
+
 Works on Windows, not bothered to check on other operating systems
 ##
 1. You run the project by running `main.py`.
@@ -46,3 +58,12 @@ Works on Windows, not bothered to check on other operating systems
     * If you have not configured it before, it will automatically configure.
 6. It launches a blue Pygame window for you to press the "Fullscreen" button so it knows your preferred screen size.
 7. Enjoy the extremely buggy square in the centre of the screen with ugly placeholder textures that you move with left, right and jump buttons! That's... literally it. (Only one developer working on a game with NO GAME ENGINE is pretty hard, you know)
+
+# Credits
+
+Thanks to [@**Tsunami014**](https://github.com/Tsunami014/) for the ldtk import in **BlazeSudio** (yes, there is an intentional typo) and to my friend who is working on the player sprites (still waiting for him to upload them).
+
+# Inspiration
+I got inspiration from [a google doodle game from Halloween 2024](https://doodles.google/doodle/halloween-2024/) where there are enemies coming at the player with symbols above their heads that you have to type / push / draw in the right order to defeat said enemy.
+
+My game has *some* similarities in how the enemies are defeated, but otherwise my game is a 2d platformer style dungeon crawler focusing on combat strategies and, well... crushing enemies using a combination of inputs. (It's called combo crusher for a reason!)

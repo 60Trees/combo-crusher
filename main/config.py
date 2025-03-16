@@ -1,2 +1,2 @@
 isConfiguringController = False
-askToConfigureController = True
+askToConfigureController = False
