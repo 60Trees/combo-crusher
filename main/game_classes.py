@@ -2,6 +2,7 @@ import math
 from typing import List, Tuple
 
 import BlazeSudio.Game.world as LDTK
+import config
 import input_ID as INP
 import pygame
 import title_screen_layout
@@ -35,6 +36,10 @@ class Game:
         self.ASSETS = Assets(self)
         self.ISPAUSED = True
         self.GMCTRL: Active_controls = None
+        self.timeplaying = 0 # This value is the amount of seconds that passed with the game open * 60
+        self.timeplayed = 0 # This value is the amount of seconds that passed with the game open since game launch * 60
+        self.timesincestart = 0 # This value is the amount of seconds that passed since the game was launched
+        self.FPS = 0
 
 pygame.font.init()
 
@@ -235,18 +240,29 @@ class Camera():
         self.bottomBorderHeight = 0
     def camera_transition(self, game: Game, centerOn, speed):
         # The speed in seconds it takes to center camera
+        
         posx, posy = centerOn
         if game.LEVEL.LVL_cameraBounds is not None:
-            print(f"Camera bounds: {game.LEVEL.LVL_cameraBounds.rectangle}, Window left edge: {posx - game.WIN.get_width() / 2 / self.zoom_in}, Window right edge: {posx + game.WIN.get_width() / 2 / self.zoom_in}")
-        if posx - game.WIN.get_width() / 2 / self.zoom_in < game.LEVEL.LVL_cameraBounds.rectangle.left:
-            posx = game.LEVEL.LVL_cameraBounds.rectangle.left + game.WIN.get_width() / 2 / self.zoom_in
-        if posx + game.WIN.get_width() / 2 / self.zoom_in > game.LEVEL.LVL_cameraBounds.rectangle.right:
-            posx = game.LEVEL.LVL_cameraBounds.rectangle.right - game.WIN.get_width() / 2 / self.zoom_in
-        if posy - game.WIN.get_height() / 2 / self.zoom_in < game.LEVEL.LVL_cameraBounds.rectangle.top:
-            posy = game.LEVEL.LVL_cameraBounds.rectangle.top + game.WIN.get_height() / 2 / self.zoom_in
-        if posy + game.WIN.get_height() / 2 / self.zoom_in > game.LEVEL.LVL_cameraBounds.rectangle.bottom:
-            posy = game.LEVEL.LVL_cameraBounds.rectangle.bottom - game.WIN.get_height() / 2 / self.zoom_in
-        camposx, camposy = self.pos
+            cameraBounds = game.LEVEL.LVL_cameraBounds.rectangle
+
+            smallest_area = 0
+            for r in game.LEVEL.LVL_regions:
+                if r.type == r.types.innerCameraBounds and r.isColliding(game.PLAYER.get_rect()):
+                    if r.rectangle.width * r.rectangle.height < smallest_area:
+                        cameraBounds = r.rectangle
+                        smallest_area = r.rectangle.width * r.rectangle.height
+
+            #print(f"Camera bounds: {cameraBounds}, Window left edge: {posx - game.WIN.get_width() / 2 / self.zoom_in}, Window right edge: {posx + game.WIN.get_width() / 2 / self.zoom_in}")
+            
+            if posx - game.WIN.get_width() / 2 / self.zoom_in < cameraBounds.left:
+                posx = cameraBounds.left + game.WIN.get_width() / 2 / self.zoom_in
+            if posx + game.WIN.get_width() / 2 / self.zoom_in > cameraBounds.right:
+                posx = cameraBounds.right - game.WIN.get_width() / 2 / self.zoom_in
+            if posy - game.WIN.get_height() / 2 / self.zoom_in < cameraBounds.top:
+                posy = cameraBounds.top + game.WIN.get_height() / 2 / self.zoom_in
+            if posy + game.WIN.get_height() / 2 / self.zoom_in > cameraBounds.bottom:
+                posy = cameraBounds.bottom - game.WIN.get_height() / 2 / self.zoom_in
+            camposx, camposy = self.pos
 
         camposx += (posx - camposx) / speed
         camposy += (posy - camposy) / speed
@@ -299,6 +315,7 @@ class Region():
         >This is the type of the region. There are multiple different types, for example `Camera_zoomin` and maybe `outOfBounds`
 
         """
+
         self.type: str = None
         self.define_type(entity, entityDefs)
         self.entity: LDTK.ldtk.Entity = entity
@@ -307,6 +324,7 @@ class Region():
             def __init__(self):
                 self.camera: str = "Camera_zoomin"
                 self.cameraBounds: str = "Camera_bounds"
+                self.innerCameraBounds: str = "Inner_camera_bounds"
         self.types = RegionTypes()
 
         if self.type == self.types.camera:
@@ -350,10 +368,13 @@ class Region():
     def isColliding(self, position: pygame.rect.Rect) -> bool:
         return self.rectangle.colliderect(position)
 
+    def isContaining(self, position: pygame.rect.Rect) -> bool:
+        return self.rectangle.contains(position)
+
 class Level_Interactables():
     def __init__(self, game: Game):
-        self.solid: List[List[int]] = None
-        self.nonsolid: List[List[int]] = None
+        self.SOLID: List[List[int]] = None
+        self.NONSOLID: List[List[int]] = None
 
 class Level():
     def __init__(self, game: Game):
@@ -362,14 +383,14 @@ class Level():
         self.LVL = self.current_map.get_level(0)
         self.LVL_img = self.current_map.get_pygame(0)
 
-        self.LVL_INTS = Level_Interactables(game)
+        self.intgrids = Level_Interactables(game)
         for i in self.LVL.layers:
             
             print(f"Layer {i.identifier} with intgrid {i.intgrid.intgrid}")
             if i.identifier == "Solid":
-                self.LVL_INTS.solid = i.intgrid.intgrid
+                self.intgrids.SOLID = i.intgrid.intgrid
             if i.identifier == "Nonsolid":
-                self.LVL_INTS.nonsolid = i.intgrid.intgrid
+                self.intgrids.NONSOLID = i.intgrid.intgrid
 
         self.player_start = None
 
@@ -426,7 +447,7 @@ class Level():
         pygame.draw.rect(game.SURFACE, (255, 0, 0), game.PLAYER.get_rect(), 1)
 
         # Handle camera transitions
-        game.CAMERA.camera_transition(game, game.PLAYER.pos, speed = 5)
+        game.CAMERA.camera_transition(game, (round(game.PLAYER.pos[0]), round(game.PLAYER.pos[1])), speed = (config.cameraTransitionSpeed if game.timeplaying > 3 else 1))
 
         current_zoomin_area = 0
         
@@ -436,24 +457,11 @@ class Level():
         if current_zoomin_area > 0:
             game.CAMERA.previousZoomIn = current_zoomin_area
         
-        game.CAMERA.zoom_in += (game.CAMERA.previousZoomIn - game.CAMERA.zoom_in) / 6
+        if game.timeplaying < 4:
+            game.CAMERA.zoom_in = game.CAMERA.previousZoomIn
+        else:
+            game.CAMERA.zoom_in += (game.CAMERA.previousZoomIn - game.CAMERA.zoom_in) / config.zoomInTransitionSpeed
 
-        """
-        blittingPos = (
-            -game.CAMERA.pos[0] * game.CAMERA.zoom_in + game.WIN.get_width() / 2,
-            -game.CAMERA.pos[1] * game.CAMERA.zoom_in + game.WIN.get_height() / 2
-        )
-        game.WIN.blit(
-            pygame.transform.scale(
-                game.SURFACE,
-                (
-                    game.SURFACE.get_width() * game.CAMERA.zoom_in,
-                    game.SURFACE.get_height() * game.CAMERA.zoom_in
-                )
-            ), blittingPos
-        )
-        """
-        
         cropping_area = [
             math.floor(game.CAMERA.pos[0] - (game.WIN.get_width() / (2 * game.CAMERA.zoom_in))),
             math.floor(game.CAMERA.pos[1] - (game.WIN.get_height() / (2 * game.CAMERA.zoom_in))),
@@ -483,6 +491,7 @@ class Level():
 
         # Blit the scaled surface to the screen
         game.WIN.blit(scaled, blittingPos)
+
 class action_states():
     walk = 0
     power_attack = 1
@@ -495,7 +504,6 @@ class action_states():
 
     timer = 0
     timer_max = 0
-
 class anim_states():
     fall = 0
     idle = [1, 2, 3, 4]
@@ -548,19 +556,21 @@ class Player():
     def __init__(self, game: Game):
         self.width = 15
         self.height = 23
-        self.jumpheight = 10
+        self.jumpheight = 2
+
+        self.jumpTimer = False
 
         # Deaccelerates horizontally (by dividing itself by the value)
         self.horizontal_movement_deacceleration = 1.5
 
         # Deaccelerates vertically (by dividing itself by the value)
-        self.vertical_movement_deacceleration = 1.5
+        self.vertical_movement_deacceleration = 1.05
 
         self.vertical_movement_max_speed = 3
         self.vertical_movement_min_speed = -self.jumpheight
 
-        self.isonground = True
-        self.gravity = 0.5
+        self.ongroundtimer = 0
+        self.gravity = 0.3
 
         self.ACTION = action_states()
         self.ANIM = anim_states()
@@ -569,7 +579,8 @@ class Player():
 
         self.animupdatetimer = 0
         self.pos = game.LEVEL.player_start
-        self.previous_pos = game.LEVEL.player_start
+        self.prevPos = game.LEVEL.player_start
+        self.previous_previous_pos = self.prevPos
         self.vel = (0, 0)
         self.actionstate = 6
         self.previous_actionstate = self.actionstate
@@ -581,7 +592,7 @@ class Player():
         # 1 pixel per tick per tick (60 pixels per second per second)
         self.walkingspeed = 1
 
-    def pos_to_rect(self, pos: Tuple[float, float]) -> pygame.Rect:
+    def posRect(self, pos: Tuple[float, float]) -> pygame.Rect:
         return pygame.rect.Rect(
             pos[0] - self.width / 2,
             pos[1] - self.height,
@@ -611,7 +622,7 @@ class Player():
         else:
             raise NameError(f'Collision block side "{collision_block_side}" does not match up with "any", "u", "d", "l" or "r".')
 
-    def check_collisions(self, game: Game, intgrid: List[List[int]], player: pygame.Rect, previus_player: pygame.Rect, collision_side: str = "d", collision_block_side: str = "any") -> int:
+    def get_collision(self, game: Game, intgrid: List[List[int]], player: pygame.Rect, previus_player: pygame.Rect, coll_side: str = "d", coll_tile_side: str = "any") -> int:
         """
         Inputs the intgrid and the side of the collision, outputs the tile it's colliding with.
 
@@ -630,65 +641,66 @@ class Player():
             int: This is the intgrid tile that the character is colliding with on the`collision_side`side of the hitbox. Please note that it will return -1 if it's out of bounds.
         """
         collisionInt = 0
-        if collision_side.lower() == "u":
+
+        if coll_side.lower() == "u":
             try:
 
-                playerPos = (math.floor((player.y) / 16), math.floor((player.x + player.width / 2) / 16))
-                collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                playerPos = (math.floor((player.y) / 16), math.floor((player.x + (player.width-1) / 2) / 16))
+                collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
 
                 if collisionInt == 0:
                     playerPos = (math.floor((player.y) / 16), math.floor((player.x) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
                 if collisionInt == 0:
-                    playerPos = (math.floor((player.y) / 16), math.floor((player.x + player.width) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    playerPos = (math.floor((player.y) / 16), math.floor((player.x + (player.width-1)) / 16))
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
             except IndexError:
                 collisionInt = -1
 
-        elif collision_side.lower() == "d":
+        elif coll_side.lower() == "d":
             try:
-                playerPos = (math.floor((player.y + player.height) / 16), math.floor((player.x + player.width / 2) / 16))
-                collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                playerPos = (math.floor((player.y + math.floor(player.height - 1) - 1) / 16), math.floor((player.x + (player.width-1) / 2) / 16))
+                collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
 
                 if collisionInt == 0:
-                    playerPos = (math.floor((player.y + player.height) / 16), math.floor((player.x) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    playerPos = (math.floor((player.y + math.floor(player.height - 1)) / 16), math.floor((player.x) / 16))
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
                 if collisionInt == 0:
-                    playerPos = (math.floor((player.y + player.height) / 16), math.floor((player.x + player.width) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    playerPos = (math.floor((player.y + math.floor(player.height - 1)) / 16), math.floor((player.x + (player.width-1)) / 16))
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
             except IndexError:
                 collisionInt = -1
 
-        elif collision_side.lower() == "l":
+        elif coll_side.lower() == "l":
             try:
-                playerPos = (math.floor((player.y + player.height / 2) / 16), math.floor((player.x) / 16))
-                collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                playerPos = (math.floor((player.y + (player.height - 1) / 2) / 16), math.floor((player.x) / 16))
+                collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
 
                 if collisionInt == 0:
                     playerPos = (math.floor((player.y) / 16), math.floor((player.x) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
                 if collisionInt == 0:
-                    playerPos = (math.floor((player.y + player.height) / 16), math.floor((player.x) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    playerPos = (math.floor((player.y + player.height - 1) / 16), math.floor((player.x) / 16))
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
             except IndexError:
                 collisionInt = -1
 
-        elif collision_side.lower() == "r":
+        elif coll_side.lower() == "r":
             try:
-                playerPos = (math.floor((player.y + player.height / 2) / 16), math.floor((player.x + player.width) / 16))
-                collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                playerPos = (math.floor((player.y + (player.height - 1) / 2) / 16), math.floor((player.x + player.width - 1) / 16))
+                collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
 
                 if collisionInt == 0:
-                    playerPos = (math.floor((player.y) / 16), math.floor((player.x + player.width) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    playerPos = (math.floor((player.y) / 16), math.floor((player.x + player.width - 1) / 16))
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
                 if collisionInt == 0:
-                    playerPos = (math.floor((player.y + player.height) / 16), math.floor((player.x + player.width) / 16))
-                    collisionInt = self.collision_intgrid(intgrid, playerPos, collision_block_side)
+                    playerPos = (math.floor((player.y + (player.height - 1)) / 16), math.floor((player.x + player.width - 1) / 16))
+                    collisionInt = self.collision_intgrid(intgrid, playerPos, coll_tile_side)
             except IndexError:
                 collisionInt = -1
 
         else:
-            raise NameError(f'String "{collision_side}" does not match up with directions "u", "d", "l" or "r".')
+            raise NameError(f'String "{coll_side}" does not match up with directions "u", "d", "l" or "r".')
 
         return collisionInt
     
@@ -703,71 +715,161 @@ class Player():
             velx -= self.walkingspeed
         if game.GMCTRL.pushed[INP.moveright]:
             velx += self.walkingspeed
-        if game.GMCTRL.pushed[INP.jump]:
-            vely -= self.walkingspeed
+
+        if self.ongroundtimer < 3:
+            self.jumpTimer = 0
+        if game.GMCTRL.pushed[INP.jump] and self.jumpTimer < 3:
+            vely -= self.jumpheight
+            self.jumpTimer += 1
+            self.ongroundtimer = 3
+        
         if game.GMCTRL.pushed[INP.sneak]:
-            vely += self.walkingspeed
+            self.horizontal_movement_deacceleration = 1.8
+        else:
+            self.horizontal_movement_deacceleration = 1.5
 
         velx /= self.horizontal_movement_deacceleration
         vely /= self.vertical_movement_deacceleration
+        
+        vely += self.gravity
 
-        collisions = {
-            "d": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='d'),
-            "u": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='u'),
-            "l": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='l'),
-            "r": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='r')
+        collisions_filtered = {
+            "d": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='d', coll_tile_side='d'),
+            "u": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='u', coll_tile_side='u'),
+            "l": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='l', coll_tile_side='l'),
+            "r": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='r', coll_tile_side='r'),
         }
 
-        self.previous_pos = (posx, posy)
-
+        self.prevPos = (posx, posy)
         posx += velx
+
+        collisions_filtered = {
+            "d": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='d', coll_tile_side='d'),
+            "u": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='u', coll_tile_side='u'),
+            "l": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='l', coll_tile_side='l'),
+            "r": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='r', coll_tile_side='r'),
+        }
+
+        self.ongroundtimer += 1
+
+        direction = "l"
+        breakPoint = 0
+        if collisions_filtered[direction] != 0:
+            if direction in ["l", "r"]:
+                posx = round(posx)
+            else:
+                posy = round(posy)
+            while collisions_filtered[direction] != 0 and breakPoint < 32:
+                if direction in ["l", "r"]:
+                    posx = round(posx)
+                    posx += 1 if direction == "l" else -1
+                else:
+                    posy = round(posy)
+                    posy += 1 if direction == "u" else -1
+                
+                breakPoint += 1
+                collisions_filtered[direction] = self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side=direction, coll_tile_side=direction)
+            
+            if direction in ["l", "r"]:
+                velx = 0
+            else:
+                vely = 0
+
+        direction = "r"
+        breakPoint = 0
+        if collisions_filtered[direction] != 0:
+            if direction in ["l", "r"]:
+                posx = round(posx)
+            else:
+                posy = round(posy)
+            while collisions_filtered[direction] != 0 and breakPoint < 32:
+                if direction in ["l", "r"]:
+                    posx = round(posx)
+                    posx += 1 if direction == "l" else -1
+                else:
+                    posy = round(posy)
+                    posy += 1 if direction == "u" else -1
+                
+                breakPoint += 1
+                collisions_filtered[direction] = self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side=direction, coll_tile_side=direction)
+            
+            if direction in ["l", "r"]:
+                velx = 0
+            else:
+                vely = 0
+
         posy += vely
         
         collisions_filtered = {
-            "d": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='d', collision_block_side='d'),
-            "u": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='u', collision_block_side='u'),
-            "l": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='l', collision_block_side='l'),
-            "r": self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), self.pos_to_rect(self.previous_pos), collision_side='r', collision_block_side='r'),
+            "d": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='d', coll_tile_side='d'),
+            "u": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='u', coll_tile_side='u'),
+            "l": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='l', coll_tile_side='l'),
+            "r": self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='r', coll_tile_side='r'),
         }
 
+        direction = "u"
+        breakPoint = 0
+        if collisions_filtered[direction] != 0:
+            if direction in ["l", "r"]:
+                posx = round(posx)
+            else:
+                posy = round(posy)
+            while collisions_filtered[direction] != 0 and breakPoint < 32:
+                if direction in ["l", "r"]:
+                    posx = round(posx)
+                    posx += 1 if direction == "l" else -1
+                else:
+                    posy = round(posy)
+                    posy += 1 if direction == "u" else -1
+                
+                breakPoint += 1
+                collisions_filtered[direction] = self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side=direction, coll_tile_side=direction)
+            
+            if direction in ["l", "r"]:
+                velx = 0
+            else:
+                vely = 0
 
-        """
-        if collisions_filtered["l"] != 0:
-            while collisions_filtered["l"] != 0 and timesIncremented < 16:
-                posx += 1
-                timesIncremented += 1
-                collisions_filtered["l"] = self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), collision_side='l', collision_block_side='l')
-            velx = 0
+        direction = "d"
+        breakPoint = 0
+        if collisions_filtered[direction] != 0:
+            self.ongroundtimer = 0
+            if direction in ["l", "r"]:
+                posx = round(posx)
+            else:
+                posy = round(posy)
+            while collisions_filtered[direction] != 0 and breakPoint < 32:
+                if direction in ["l", "r"]:
+                    posx = round(posx)
+                    posx += 1 if direction == "l" else -1
+                else:
+                    posy = round(posy)
+                    posy += 1 if direction == "u" else -1
+                
+                breakPoint += 1
+                collisions_filtered[direction] = self.get_collision(game, game.LEVEL.intgrids.SOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side=direction, coll_tile_side=direction)
+            
+            if direction in ["l", "r"]:
+                velx = 0
+            else:
+                vely = 0
 
-        if collisions_filtered["r"] != 0:
-            while collisions_filtered["r"] != 0 and timesIncremented < 16:
-                posx -= 1
-                timesIncremented += 1
-                collisions_filtered["r"] = self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), collision_side='r', collision_block_side='r')
-            velx = 0
-        
-        if collisions_filtered["d"] != 0:
-            while collisions_filtered["d"] != 0 and timesIncremented < 16:
+        semisolidCollision = self.get_collision(game, game.LEVEL.intgrids.NONSOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='d', coll_tile_side='d')
+        semisolidCollisionPrevious = self.get_collision(game, game.LEVEL.intgrids.NONSOLID, self.posRect(self.prevPos), self.posRect(self.prevPos), coll_side='d', coll_tile_side='d')
+
+        breakPoint = 0
+        if semisolidCollision != 0 and self.prevPos[1] < posy and semisolidCollisionPrevious == 0 and not game.GMCTRL.pushed[INP.sneak]:
+            while semisolidCollision != 0 and breakPoint < 16:
+                posy = round(posy)
                 posy -= 1
-                timesIncremented += 1
-                collisions_filtered["d"] = self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), collision_side='d', collision_block_side='d')
+                semisolidCollision = self.get_collision(game, game.LEVEL.intgrids.NONSOLID, self.posRect((posx, posy)), self.posRect(self.prevPos), coll_side='d', coll_tile_side='d')
             vely = 0
-
-        if collisions_filtered["u"] != 0:
-            while collisions_filtered["u"] != 0 and timesIncremented < 16:
-                posy += 1
-                timesIncremented += 1
-                collisions_filtered["u"] = self.check_collisions(game, game.LEVEL.LVL_INTS.solid, self.pos_to_rect((posx, posy)), collision_side='u', collision_block_side='u')
-            vely = 0
-        """
-        #print(f"\
-        #Collision up: {collisions['u']}, Collision down: {collisions['d']}, Collision left: {collisions['l']}, Collision right: {collisions['r']} \
-        #Filtered collision up: {collisions_filtered["u"]}, Collision down: {collisions_filtered["d"]}, Collision left: {collisions_filtered["l"]}, Collision right: {collisions_filtered["r"]}")
-        #posx, posy, velx, vely = self.handle_collisions(game, (posx, posy), (velx, vely), collisions)
+            self.ongroundtimer = 0
+        #print(f"Filtered collision up: {collisions_filtered["u"]}, Collision down: {collisions_filtered["d"]}, Collision left: {collisions_filtered["l"]}, Collision right: {collisions_filtered["r"]}\
+        #Onground: {self.ongroundtimer}, Previous pos - current pos: {self.prevPos[1] - posy}")
 
         self.pos = posx, posy
         self.vel = velx, vely
         
     def handle_anim(self, game: Game):
         pass
-    

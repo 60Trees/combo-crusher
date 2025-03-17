@@ -42,6 +42,7 @@ if __name__ == "__main__":
 
         GAME.draw_game(game)
 
+        game.FPS = clock.get_fps()
         pygame.display.update(pygame.Rect(0, 0, WIN.get_width(), WIN.get_height()))
         clock.tick(60)
 
