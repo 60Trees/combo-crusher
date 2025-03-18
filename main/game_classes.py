@@ -6,6 +6,7 @@ import config
 import input_ID as INP
 import pygame
 import title_screen_layout
+import util_handling
 from control import Active_controls
 
 left = False
@@ -40,6 +41,10 @@ class Game:
         self.timeplayed = 0 # This value is the amount of seconds that passed with the game open since game launch * 60
         self.timesincestart = 0 # This value is the amount of seconds that passed since the game was launched
         self.FPS = 0
+
+        self.isDeveloper = True
+
+        self.debugScreen = util_handling.load("main/debug_screen.json")
 
 pygame.font.init()
 
@@ -245,10 +250,10 @@ class Camera():
         if game.LEVEL.LVL_cameraBounds is not None:
             cameraBounds = game.LEVEL.LVL_cameraBounds.rectangle
 
-            smallest_area = 0
+            smallest_area = None
             for r in game.LEVEL.LVL_regions:
                 if r.type == r.types.innerCameraBounds and r.isColliding(game.PLAYER.get_rect()):
-                    if r.rectangle.width * r.rectangle.height < smallest_area:
+                    if smallest_area is None or r.rectangle.width * r.rectangle.height < smallest_area:
                         cameraBounds = r.rectangle
                         smallest_area = r.rectangle.width * r.rectangle.height
 
@@ -325,6 +330,7 @@ class Region():
                 self.camera: str = "Camera_zoomin"
                 self.cameraBounds: str = "Camera_bounds"
                 self.innerCameraBounds: str = "Inner_camera_bounds"
+                self.killZone: str = "Killzone"
         self.types = RegionTypes()
 
         if self.type == self.types.camera:
@@ -381,18 +387,24 @@ class Level():
         self.current_map = LDTK.World(f"main/assets/game/levels/{game.WORLD.get_level_name()}.ldtk")
     
         self.LVL = self.current_map.get_level(0)
-        self.LVL_img = self.current_map.get_pygame(0)
+        self.LVL_img: List[Tuple[Surface, Tuple[float, float]]] = self.current_map.get_pygame_with_parralax(0)
+
+        self.interactaleEntities: List[LDTK.ldtk.Entity] = []
+        
+        for i in self.LVL.entities:
+            if "Entity" in i.defData["tags"]:
+                self.interactaleEntities.append(i)
 
         self.intgrids = Level_Interactables(game)
+        
         for i in self.LVL.layers:
-            
             print(f"Layer {i.identifier} with intgrid {i.intgrid.intgrid}")
             if i.identifier == "Solid":
                 self.intgrids.SOLID = i.intgrid.intgrid
             if i.identifier == "Nonsolid":
                 self.intgrids.NONSOLID = i.intgrid.intgrid
 
-        self.player_start = None
+        self.player_start: Tuple[float, float] = None
 
         self.LVL_regions: List[Region] = []
 
@@ -416,17 +428,21 @@ class Level():
 
     def render(self) -> Surface:
         if self.LVL_img is None:
-            self.LVL_img = self.current_map.get_pygame()
+            self.LVL_img = self.current_map.get_pygame_with_parralax(0)
         return self.LVL_img
 
     def draw_refresh(self, game: Game):
         pass
 
     def draw(self, game: Game):
-        game.SURFACE = pygame.surface.Surface(self.LVL_img.get_size())
+        game.SURFACE = pygame.surface.Surface(self.LVL_img[0][0].get_size())
 
+        game.SURFACE.fill(self.current_map.ldtk.levels[0].bgColourRGB)
+        
         # Blit level
-        game.SURFACE.blit(self.LVL_img, (0, 0))
+        for i in self.LVL_img:
+            # i[1][0] or i[1][1] is the parralax which is applied to the coordinates in a way that creates a fake "3D" effect. Greater than zero makes it move like a background and less than the camera, eg mountains in the distance and less than zero makes it movemore than the camera like in the foreground , eg bushes in the foreground.
+            game.SURFACE.blit(i[0], (i[1][0] * game.CAMERA.pos[0], i[1][1] * game.CAMERA.pos[1]))
 
         # Blit player
         surf = game.ASSETS.player_sprites[0]
@@ -444,7 +460,9 @@ class Level():
             blittingPos
         )
 
-        pygame.draw.rect(game.SURFACE, (255, 0, 0), game.PLAYER.get_rect(), 1)
+        # Draw precice player hitbox
+        if game.isDeveloper:
+            pygame.draw.rect(game.SURFACE, (255, 0, 0), game.PLAYER.get_rect(), 1)
 
         # Handle camera transitions
         game.CAMERA.camera_transition(game, (round(game.PLAYER.pos[0]), round(game.PLAYER.pos[1])), speed = (config.cameraTransitionSpeed if game.timeplaying > 3 else 1))
@@ -491,6 +509,11 @@ class Level():
 
         # Blit the scaled surface to the screen
         game.WIN.blit(scaled, blittingPos)
+
+        if game.isDeveloper:
+            # Draws information like FPS on the left of the screen using the font
+            tmp_fontsurf = game.GUI.assets.pixelfont.render(f"FPS: {round(game.FPS)}", True, (255, 255, 255))
+            game.WIN.blit(tmp_fontsurf, (0, 0))
 
 class action_states():
     walk = 0
@@ -710,6 +733,15 @@ class Player():
 
         posx, posy = self.pos
         velx, vely = self.vel
+
+        if game.GMCTRL.tapped[INP.minimap]:
+            self.pos = game.LEVEL.player_start
+            posx, posy = game.LEVEL.player_start
+        
+        for i in game.LEVEL.LVL_regions:
+            if i.type == i.types.killZone and i.isColliding(self.get_rect()):
+                self.pos = game.LEVEL.player_start
+                posx, posy = game.LEVEL.player_start
 
         if game.GMCTRL.pushed[INP.moveleft]:
             velx -= self.walkingspeed

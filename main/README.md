@@ -67,3 +67,5 @@ Thanks to [@**Tsunami014**](https://github.com/Tsunami014/) for the ldtk import 
 I got inspiration from [a google doodle game from Halloween 2024](https://doodles.google/doodle/halloween-2024/) where there are enemies coming at the player with symbols above their heads that you have to type / push / draw in the right order to defeat said enemy.
 
 My game has *some* similarities in how the enemies are defeated, but otherwise my game is a 2d platformer style dungeon crawler focusing on combat strategies and, well... crushing enemies using a combination of inputs. (It's called combo crusher for a reason!)
+
+[Some cool knight pixel art](https://adrverissimo.itch.io/knight-pixel-art)

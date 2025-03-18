@@ -1,0 +1,60 @@
+{
+    "lineSpacing": 20,
+    "left": [
+        [
+            {
+                "type": "plaintext",
+                "value": "FPS: "
+            },
+            {
+                "type": "variable",
+                "value": "game.FPS"
+            },
+            {
+                "type": "plaintext",
+                "value": "."
+            }
+        ],
+        [
+            {
+                "type": "plaintext",
+                "value": "Time playing: "
+            }
+        ],
+        [
+            {
+                "type": "plaintext",
+                "value": "Time played: "
+            }
+        ],
+        [
+            {
+                "type": "plaintext",
+                "value": "Time since start: "
+            }
+        ]
+    ],
+    "right": [
+        [
+
+        ],
+        [
+            {
+                "type": "variable",
+                "value": "game.timeplaying"
+            }
+        ],
+        [
+            {
+                "type": "variable",
+                "value": "game.timeplayed"
+            }
+        ],
+        [
+            {
+                "type": "variable",
+                "value": "game.timesincestart"
+            }
+        ]
+    ]
+}
